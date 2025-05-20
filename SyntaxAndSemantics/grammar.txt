@@ -10,7 +10,7 @@ stmt ::= assign_val | assign_func_call | if | while | sequence | returnStmt | ar
 
 assign_val ::= identifier "=" expr ";"
 assign_func_call ::= identifier "=" "call" identifier "(" [paramlist] ")" ";"
-array_create ::= identifier "=" "new" "Array" "(" arithExpr ")" ";"
+array_create ::= identifier "=" "new" "array" "(" arithExpr ")" ";" 
 array_assign ::= identifier "[" arithExpr "]"  "=" expr ";"
 
 if ::= "if" "(" expr ")" stmt "else" stmt
