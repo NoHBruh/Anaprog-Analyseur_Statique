@@ -1,0 +1,18 @@
+function main() {
+     x = 5 * 2;
+     z18 = new Array(10);
+     z18[2]=5;
+     y = z[2];
+     if(y>0) 
+        {x = call add1(x);}
+      else{
+         x=0;
+      }
+      while(y > 0){
+         y = y - 1;
+      }
+  } 
+function add1( b ) {
+    b = b + 1;
+     return b;
+    }    
