@@ -5,3 +5,7 @@ __pycache__/
 
 #virtual environnement
 .venv
+
+#parser related
+*.out
+*parsetab.py 
