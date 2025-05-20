@@ -89,7 +89,7 @@ t_RBRACKET = r'\]'
 t_SEMICOLON = r';'
 t_COMMA = r','
 
-t_ignore = '\t'
+t_ignore = ' \t'
 
 # Rule for tracking line numbers
 def t_newline(t):
