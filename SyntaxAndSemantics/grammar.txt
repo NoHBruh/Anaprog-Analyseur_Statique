@@ -15,7 +15,7 @@ array_assign ::= identifier "[" arithExpr "]"  "=" expr ";"
 
 if ::= "if" "(" expr ")" stmt "else" stmt
 while ::= "while" "(" expr ")" stmt
-sequence ::= "{" stmtList "}"
+sequence ::= "{" stmtlist "}"
 returnStmt ::= "return" expr ";"
 
 expr ::= arithExpr | boolExpr |  identifier "[" arithExpr "]" | identifier "[" "]"
