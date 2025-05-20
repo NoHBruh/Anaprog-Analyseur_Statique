@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 
 # Get the token map from the lexer.  This is required.
-from .lexer import tokens
+from lexer import tokens
 
 DEBUG = True
 
@@ -69,7 +69,7 @@ def p_assign_val(p) :
                 #var_name  #var_value
 
 def p_assign_func_call(p):
-    '''assign_func_call : IDENTIFIER EQUAL CALL funCall LPAR PARAMLIST RPAR SEMICOLON'''
+    '''assign_func_call : IDENTIFIER EQUAL CALL funcCall LPAR paramlist RPAR SEMICOLON'''
     
     var_name = p[1]
     func_name = p[4]
@@ -91,20 +91,20 @@ def p_array_assign(p):
     p[0] = ('array_assign', array_name, index, p[6])
     
 def p_if(p):
-    '''if : IF LPAR expr RPAR stmt ELSE stmt'''
+    '''stmt : IF LPAR expr RPAR stmt ELSE stmt'''
     p[0] = ('if', p[3], p[5], p[7])
     
     
 def p_while(p) :
-    '''while : WHILE LPAR expr RPAR stmt'''
+    '''stmt : WHILE LPAR expr RPAR stmt'''
     p[0] = ('while', p[3], p[5])
 
 def p_sequence(p):
-    '''sequence : LBRACE stmtlist LBRACE'''
+    '''stmt : LBRACE stmtlist RBRACE'''
     p[0] = ('sequence', p[2])
     
 def p_returnStmt(p):
-    '''returnStmt : RETURN expr SEMICOLON'''
+    '''stmt : RETURN expr SEMICOLON'''
     
     p[0] = ('return', p[2])
     
@@ -142,7 +142,7 @@ def p_noprnd_var(p) :
 
 
 def p_noprnd_num(p) :
-    '''noprnd : num'''
+    '''noprnd : NUMBER'''
     p[0] = p[1]
     
     
