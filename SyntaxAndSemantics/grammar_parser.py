@@ -28,7 +28,7 @@ def p_functionlist(p) :
 
 def p_function(p) :
     '''function : FUNCTION IDENTIFIER LPAR  paramlist RPAR LBRACE stmtlist RBRACE'''
-    p[0] = (p[2],p[4], p[7])
+    p[0] = ('function', p[2],p[4], p[7])
     
 def p_paramlist(p) :
     '''paramlist : param
