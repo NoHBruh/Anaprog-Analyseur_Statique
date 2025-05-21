@@ -24,4 +24,56 @@ class AstVisitor :
     def default_visitor(self,node) :
         """default visitor for unsupported node types"""
         raise Exception(f"Unsupported node type for {node[0]} node, no visitor found")
+    
+    
+    def visit_program(self, node) :
+        
+        
+    def visit_main(self, node):
+        
+    
+    def visit_function(self, node) :
+        
+    
+    def visit_var(self, node) :
+        
+     
+    def visit_number(self, node) :
+        
+        
+    def visit_assign(self, node) :
+        
+        
+    def visit_assign_func_call(self, node):
+        
+        
+    def visit_array_create(self, node) :
+        
+        
+    def visit_array_assign(self, node) :
+       
+        
+    def visit_array_expr(self, node) :
+        
+        
+    def visit_if(self, node) :
+        
+        
+    def visit_while(self, node) :
+        
+    
+    def visit_sequence(self, node) :
+        
+    
+    def visit_return(self, node) :
+        
+    
+    def visit_func_call(self, node) :
+        
+        
+    def visit_arithExpr_binOP(self, node) :
+        
+        
+    def visit_boolExpr(self, node) :
+        
         
