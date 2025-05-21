@@ -13,7 +13,7 @@ def p_program(p) :
     
 def p_main(p) :
     '''main : FUNCTION MAIN LPAR RPAR LBRACE stmtlist RBRACE functionlist'''
-    p[0] = (p[6], p[8])
+    p[0] = ('main', p[6], p[8])
     
 def p_functionlist(p) :
     '''functionlist : function
