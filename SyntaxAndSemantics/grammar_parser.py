@@ -143,7 +143,7 @@ def p_noprnd_var(p) :
 
 def p_noprnd_num(p) :
     '''noprnd : NUMBER'''
-    p[0] = p[1]
+    p[0] = ('number', p[1])
     
     
 def p_boprnd_true(p) :
@@ -188,7 +188,7 @@ def p_boolExpr_binOp(p):
     if len(p) == 2:
         p[0] = p[1]
     else :
-        p[0] = (p[1], p[2], p[3])   
+        p[0] = ('boolExpr',p[1], p[2], p[3])   
     
         
 def p_error(p):
