@@ -25,33 +25,153 @@ class AstVisitor :
         """default visitor for unsupported node types"""
         raise Exception(f"Unsupported node type for {node[0]} node, no visitor found")
     
+  #-------------------------------------
+  
     
     def visit_program(self, node) :
+        _, program_body = node #(p[0] = ('program', p[1])) in grammar_parser.py, p[1] is program body
+        main = (program_body[0], program_body[1]) #name and stmtist
+        prog_functions = program_body[2] # functionlist
         
-        
-    def visit_main(self, node):
-        
+        '''program functions must be analyzed first, as they might be used in main program'''
+    
+        # ----------------Functions analysis----------------
+
+        if prog_functions != [None] : 
+            for func in prog_functions :
+                self.visit(func)
+            
+        # ----------------Main analysis----------------
+        self.visit(main)
+    
+    
+    
+    #--------------------------------------------
     
     def visit_function(self, node) :
+        try:
+            _, function_id, param_list, stmt_list = node
+        except ValueError:
+            print(f"Invalid function node : {node}")
+            return
         
-    
+        if self.sym_table.exist(function_id) :
+            raise Exception(f"Function '{function_id}'already exists")
+        
+        self.sym_table.insert(function_id, token_type="function", token_value =(param_list, stmt_list))
+        
+    def visit_main(self, node):
+        name, stmt_list = node
+        
+        if not self.sym_table.exist(name) :
+            self.sym_table.insert(name, token_type ="function")
+        
+        #entering main scope
+        self.sym_table.new_scope()
+        for stmt in stmt_list :
+            self.visit(stmt)
+        self.sym_table.leave_scope()
+        
+    #---------------------------------------------    
+        
     def visit_var(self, node) :
+        _, var_id = node
         
+        if not self.sym_table.exist(var_id) :
+            raise Exception(f"Variable '{var_id}' does not exist")
+        
+        var_value = self.sym_table.lookup(var_id)["Value"]
+        print(f'var {var_id} with value {var_value}')
+        return var_value
      
     def visit_number(self, node) :
-        
+        _, val = node
+        return val
         
     def visit_assign(self, node) :
+        _, var_id, value = node
+        if isinstance(var_id, tuple) and var_id[0] =='array_access':
+            _, array_id, index = var_id
+            idx = self.visit(index)
+            
+            if not self.sym_table.exist(array_id) :
+                raise Exception(f'Array {array_id} does not exist')
+            
+            # updating array
+            array_data = self.sym_table.lookup(array_id)
+            array_size = array_data["size"]
+            
+            #Asserting array size was not altered
+            if array_data["Type"] != "array":
+                raise Exception(f'{array_id} is not an array')
+            if not (0<= idx < array_size):
+                raise Exception(f'Index {idx} out of bounds with array {array_id} of size {array_size}')
+            
+            val = self.visit(value)
+            array_data["Value"][idx] = val
+            prinf(f'Updatined array {array_id} at index {idx} to value {val}')
+            return
         
+        #Variable assignment
+        val = self.visit(value)
+        
+        if not self.sym_table.exist(var_id):
+            if (isinstance(val, list)):
+                self.sym_table.insert(var_id, token_type = "array", token_value = val, size = len(val))
+            else:
+                self.sym_table.insert(var_id, token_type = "variable", token_value = val)
+        
+        else :
+            self.sym_table.update(var_id, value = val)
+        
+        print(f"Added/Updated variable '{var_id}' with value: {val}")
         
     def visit_assign_func_call(self, node):
         
         
     def visit_array_create(self, node) :
+        _, array_id, size = node
+        
+        if isinstance(size, tuple) and size[0] == 'number' :
+            array_size = size[1]
+        elif isinstance(size, tuple) and size[0] == 'variable':
+            size_var = size
+            if not self.sym_table.exist(size_var) :
+                raise Exception(f'size variable {size_var} does not exist')
+            array_size = self.sym_table.lookup(size_var)["Value"]
+        
+        else:
+            raise Exception("Invalid size")
+        
+        if self.sym_table.exist(array_id) :
+            raise Exception(f'Array {array_id} already exists')
+            
+        self.sym_table.insert(array_id, token_type = "array", size = array_size, token_value = [None] * array_size)
+        
+        print(f'Array {array_id} of size {array_size} initialized')      
+        
+        
         
         
     def visit_array_assign(self, node) :
-       
+        _, array_id, index, value = node
+        if not self.sym_table.exist(array_id):
+            raise Exception(f' array {array_id} does not exist')
+        
+        array_data = self.sym_table.lookup(array_id)
+        if array_data["Type"] != "array" :
+            raise Exception(f'{array_id} is not an array')
+
+        idx_value = self.visit(index)
+        if not (0<= idx_value < array_data["size"]):
+            raise Exception(f'Index out of bounds for array {array_id}')
+        
+        #Assigning values
+        val = self.visit(value)
+        
+        array_data["Value"][idx_value] = val
+        
+        print(f'Array {array_id} updated at index {idx_value} to value {val}')
         
     def visit_array_expr(self, node) :
         
@@ -63,13 +183,19 @@ class AstVisitor :
         
     
     def visit_sequence(self, node) :
-        
+        print(f'visiting node {node}')
+        _, stmt_list = node
+        for stmt in stmt_list :
+            self.visit(stmt)
     
     def visit_return(self, node) :
-        
+         _, return_val = node
+         print(f'returning {node}')
+         return self.visit(return_val)
+     
     
     def visit_func_call(self, node) :
-        
+       
         
     def visit_arithExpr_binOP(self, node) :
         
