@@ -2,7 +2,7 @@ class SymbolTable :
     def __init__(self): #equivalent of allocate function
         self.scopes = [{}] #list of dictionnaries
         
-    def insert(self, symbol, token_type,token_value, **kwargs) :
+    def insert(self, symbol, token_type,token_value, **kwargs) : #additional kwargs for array size
         if symbol in self.scopes[-1] : # always checking the inner scope
             raise Exception (f"{symbol} already in scope")
         
@@ -13,17 +13,17 @@ class SymbolTable :
         print(f"Added symbol: {symbol} -> {self.scopes[-1][symbol]}")
      
     def remove(self, symbol):
-        current = self.scope[-1]
+        current = self.scopes[-1]
         if symbol in current :
             del current[symbol]
         else:
             raise Exception(f"{symbol} has not been declared")
                
         
-    def update(self, symbol, Value = None, **kwargs) :
+    def update(self, symbol, value = None, **kwargs) :
         for scope in reversed(self.scopes) :
             if symbol in scope :
-                scope[symbol].update({"Value" : Value})
+                scope[symbol].update({"Value" : value})
                 print(f"symbol updated : {symbol} -> {scope[symbol]}")
                 return
         raise Exception(f"{symbol} has not been declared")
