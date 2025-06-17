@@ -1,8 +1,9 @@
 class SymbolTable :
     def __init__(self): #equivalent of allocate function
         self.scopes = [{}] #list of dictionnaries
+        self.default = 0
         
-    def insert(self, symbol, token_type,token_value, **kwargs) : #additional kwargs for array size
+    def insert(self, symbol, token_type = None,token_value = None, **kwargs) : #additional kwargs for array size
         if symbol in self.scopes[-1] : # always checking the inner scope
             raise Exception (f"{symbol} already in scope")
         
