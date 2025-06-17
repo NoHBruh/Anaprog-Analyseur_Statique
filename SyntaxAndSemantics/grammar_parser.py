@@ -158,7 +158,7 @@ def p_boprnd_false(p) :
      
 def p_var(p) :
     '''var : IDENTIFIER'''
-    p[0] = ('var_name', p[1])
+    p[0] = ('var', p[1])
     
     
 def p_arithExpr_binOp(p):
