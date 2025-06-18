@@ -21,10 +21,10 @@ class SymbolTable :
             raise Exception(f"{symbol} has not been declared")
                
         
-    def update(self, symbol, value = None, **kwargs) :
+    def update(self, symbol, token_value = None, **kwargs) :
         for scope in reversed(self.scopes) :
             if symbol in scope :
-                scope[symbol].update({"Value" : value})
+                scope[symbol].update({"Value" : token_value})
                 print(f"symbol updated : {symbol} -> {scope[symbol]}")
                 return
         raise Exception(f"{symbol} has not been declared")
