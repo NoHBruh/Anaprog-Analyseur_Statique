@@ -48,7 +48,7 @@ def process_bool_binOp(left, operator, right) :
             return left >= right
         
         case "<=" :
-            return right <= right
+            return left <= right
         
         case "and" :
             return left and right
