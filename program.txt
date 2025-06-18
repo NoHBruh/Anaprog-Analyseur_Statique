@@ -1,3 +1,15 @@
-function main(){
-   x = 5;
+function main() {
+     x = 5 * 2;
 }
+function caca(){
+   return 1;
+}
+
+function bruh(){
+   y = 6;
+   return y;
+}
+
+
+
+  
