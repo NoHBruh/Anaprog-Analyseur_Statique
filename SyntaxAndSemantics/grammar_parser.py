@@ -20,10 +20,10 @@ def p_functionlist(p) :
                     | function functionlist
                     | empty'''
     if len(p) == 2 :
-        p[0] = p[1]
+        p[0] = [p[1]]
     
     else :
-        p[0] = [p[1]] + [p[2]]
+        p[0] = [p[1]] + p[2]
         
 
 def p_function(p) :
