@@ -39,8 +39,9 @@ class AstVisitor :
         print("Visiting program")
         # ----------------Functions analysis----------------
 
-        if prog_functions != None : 
+        if prog_functions != [None] : 
             for func in prog_functions :
+                print(f' IN LOOP {func}')
                 self.visit(func)
             
         # ----------------Main analysis----------------
@@ -62,6 +63,7 @@ class AstVisitor :
             raise Exception(f"Function '{function_id}'already exists")
         
         self.sym_table.insert(function_id, token_type="function", token_value =(param_list, stmt_list))
+        print(f'visiting fuction {function_id}')
         
     def visit_main(self, node):
         print("Visiting main")
@@ -94,6 +96,7 @@ class AstVisitor :
         
     def visit_assign(self, node) :
         _, var_id, value = node
+        print(f'visiting assign : {var_id} = {value}')
         if isinstance(var_id, tuple) and var_id[0] =='array_access':
             _, array_id, index = var_id
             idx = self.visit(index)
@@ -126,7 +129,7 @@ class AstVisitor :
                 self.sym_table.insert(var_id, token_type = "variable", token_value = val)
         
         else :
-            self.sym_table.update(var_id, value = val)
+            self.sym_table.update(var_id, token_value = val)
         
         print(f"Added/Updated variable '{var_id}' with value: {val}")
         
@@ -171,7 +174,8 @@ class AstVisitor :
             if not self.sym_table.exist(var_id):
                 self.sym_table.insert(var_id, token_type="variable", token_value= return_val)
             else:
-                self.sym_table.update(var_id, Value=return_val)
+                self.sym_table.update(var_id, token_value=return_val)
+            print(f'added/updated {var_id} with return value {return_val}')
             
         finally:
             self.call_stack.pop()
@@ -320,6 +324,7 @@ class AstVisitor :
         
     def visit_arithExpr_binOP(self, node) :
         _, left, operator, right = node
+        print(f"visiting arithmetic operation: {left} {operator} {right}")
         
         left_val = left[1] #'number'
         right_val = right[1] #'number'
