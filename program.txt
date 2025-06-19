@@ -1,14 +1,13 @@
 function main() {
-     x = 5 * 2;
+   y = 1;
+   z = call plus1(y);
+
 }
-function caca(){
-   return 1;
+function plus1( b){
+   var = b + 1;
+   return var;
 }
 
-function bruh(){
-   y = 6;
-   return y;
-}
 
 
 
