@@ -41,7 +41,6 @@ class AstVisitor :
 
         if prog_functions != [None] : 
             for func in prog_functions :
-                print(f' IN LOOP {func}')
                 self.visit(func)
             
         # ----------------Main analysis----------------
@@ -58,7 +57,7 @@ class AstVisitor :
         except ValueError:
             print(f"Invalid function node : {node}")
             return
-        
+    
         if self.sym_table.exist(function_id) :
             raise Exception(f"Function '{function_id}'already exists")
         
@@ -135,6 +134,7 @@ class AstVisitor :
         
     def visit_assign_func_call(self, node):
         _, var_id, _function, _args = node
+        print(f'visiting function call {_function[1]} with arguments {_args}')
         
         func_id = _function[1]
         
@@ -161,7 +161,7 @@ class AstVisitor :
                     _arg = self.visit(_arg)
 
                 if not self.sym_table.exist(param[1]):
-                    self.sym_table.insert(param_[1], token_type="parameter", token_value=_arg)
+                    self.sym_table.insert(param[1], token_type="parameter", token_value=_arg)
                 else:
                     self.sym_table.update(param[1], token_type="parameter", token_value = _arg)
             
@@ -322,7 +322,7 @@ class AstVisitor :
             
         self.sym_table.leave_scope()
         
-    def visit_arithExpr_binOP(self, node) :
+    def visit_arithExpr_binOp(self, node) :
         _, left, operator, right = node
         print(f"visiting arithmetic operation: {left} {operator} {right}")
         
