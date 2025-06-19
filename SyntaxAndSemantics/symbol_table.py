@@ -42,11 +42,17 @@ class SymbolTable :
     
     
     def new_scope(self) :
+        print('\n')
+        print("-----creating new scope-----")
+        print('\n')
         self.scopes.append({})
         
     
     def leave_scope(self) :
         if len(self.scopes) > 1 :
+            print('\n')
+            print("-----leaving actual scope-----")
+            print('\n')
             self.scopes.pop()
         else :
             raise Exception("Cannot leave global scope")
