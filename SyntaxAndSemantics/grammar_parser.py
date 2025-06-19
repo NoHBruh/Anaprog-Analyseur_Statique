@@ -37,8 +37,8 @@ def p_paramlist(p) :
     if len(p) == 2 and p[1] is not None : #Single parameter paramlist
         p[0] = [p[1]]
         
-    if len(p) > 2 : #multiple parameter paramlist
-        p[0] = [p[1]] + [p[3]]
+    elif len(p) > 2 : #multiple parameter paramlist
+        p[0] = [p[1]] + p[3]
         
     else : # empty paramlist
         p[0] = []
@@ -54,7 +54,7 @@ def p_stmtlist(p):
     if len(p) == 2 :
         p[0] = [p[1]]
     else:
-        p[0] = [p[1]] + [p[2]]
+        p[0] = [p[1]] + p[2]
         
 def p_stmt(p):
     '''stmt : assign_val
