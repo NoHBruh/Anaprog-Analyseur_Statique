@@ -115,7 +115,7 @@ class AstVisitor :
             
             val = self.visit(value)
             array_data["Value"][idx] = val
-            prinf(f'Updatined array {array_id} at index {idx} to value {val}')
+            print(f'Updatined array {array_id} at index {idx} to value {val}')
             return
         
         #Variable assignment
@@ -186,8 +186,9 @@ class AstVisitor :
         
         if isinstance(size, tuple) and size[0] == 'number' :
             array_size = size[1]
-        elif isinstance(size, tuple) and size[0] == 'variable':
-            size_var = size
+        elif isinstance(size, tuple) and size[0] == 'var':
+            size_var = size[1]
+            print("CACA")
             if not self.sym_table.exist(size_var) :
                 raise Exception(f'size variable {size_var} does not exist')
             array_size = self.sym_table.lookup(size_var)["Value"]
