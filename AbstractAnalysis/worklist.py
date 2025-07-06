@@ -71,6 +71,10 @@ class Worklist:
         _, val = node
         return val
     
+    def visit_negnumber(self, node) :
+        _, _, val = node
+        return -val
+    
     def visit_assign(self, node) :
         _, var_id, value = node
         print(f'visiting assign : {var_id} = {value}')
@@ -95,12 +99,16 @@ class Worklist:
         _, array_id, size = node
         
         match size :
-            case ('num', const) :
-                if const < 0 :
-                    self.warnings.add_warning(WarningType.ERROR, f"constant {const} is negative and cannot be used as an array size")
+            case ('negnum',_, const) :
+                self.warnings.add_warning(WarningType.ERROR, f"constant {const} is negative and cannot be used as an array size")
+                self.array_sizes[array_id] = -const
+                print(f"added array {array_id} with size {const}")
+            
+            case('number', const) :
+                if const > AbstractDomain.TOP :
+                    self.warnings.add_warning(WarningType.ERROR, "integer too large to use use as an array size")
                     return
                 self.array_sizes[array_id] = const
-                print(f"added array {array_id} with size {const}")
                 
             case('boprnd', bool_const) :
                 self.warnings.add_warning(WarningType.ERROR, f"constant {bool_const} is a boolean and cannot be used as an array size") 
