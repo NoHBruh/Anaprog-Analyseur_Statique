@@ -1,27 +1,22 @@
+import operator
+
+bops = {'==' : operator.eq, '!=' : operator.ne, '>=' : operator.ge, '<=' : operator.le, '>' : operator.gt, '<' : operator.lt,
+       'and' : operator.and_, 'or' : operator.or_}
+
+arith_ops = {"+": operator.add, "-": operator.sub, '*' : operator.mul, '/' : operator.truediv }
+
 def process_arith_binOp(left, operator, right):
     if isinstance(left, tuple) :
        left = left[1]
        
     if isinstance(right, tuple):
         right = right[1]
-    
-    match operator :
-        
-        case "+" :
-            return left + right
-        
-        case "-" :
-            return left - right
-        
-        case "*" :
-            return left * right
-                   
-        case "/" :
-            if right == 0 :
-                raise Exception("Dividing by zero is unallowed")    
-            return left // right
-        
-    raise Exception(f'{operator} unsupported arithmetic operator')
+    try:
+        return arith_ops[operator](left, right)
+    except (ValueError, ZeroDivisionError) as e:
+        print(e)
+        return
+
 
 def process_bool_binOp(left, operator, right) :
     if isinstance(left, tuple) :
@@ -30,30 +25,8 @@ def process_bool_binOp(left, operator, right) :
     if isinstance(right, tuple):
         right = right[1]
         
-    match operator :
-        
-        case "==" :
-         return left == right
-        
-        case "!=" :
-         return left != right 
-        
-        case ">" :
-            return left > right
-              
-        case "<" :
-            return left < right 
-        
-        case ">=" :
-            return left >= right
-        
-        case "<=" :
-            return left <= right
-        
-        case "and" :
-            return left and right
-            
-        case "or" :
-            return left or right
-    
-    raise Exception(f'{operator} unsupported boolean operator')
+    try:
+        return bops[operator](left, right)
+    except ValueError:
+        print(f'{operator} unsupported boolean operator')
+        return
