@@ -331,20 +331,20 @@ class AstVisitor :
     def visit_arithExpr_binOp(self, node) :
         _, left, operator, right = node
         print(f"visiting arithmetic operation: {left} {operator} {right}")
-        if left[0] == 'number' :
+        if left[0] in {'number','var'} :
             left_val = left[1]
             
         elif left[0] == 'negnumber' : 
             left_val = -left[2] #for negatives
            
          
-        if right[0] == "number" : 
+        if right[0] in {'number','var'} : 
             right_val = right[1] 
             
         elif right[0] == 'negnumber' :
             right_val = -right[2]
             
-        
+        #lookup for variable values in sym_tab
         if isinstance(left_val, str):
             left_val =  self.sym_table.lookup(left_val)["Value"]
         
