@@ -92,7 +92,11 @@ class AstVisitor :
     def visit_number(self, node) :
         _, val = node
         return val
-        
+    
+    def visit_negnumber(self, node) :
+        _, _ , val = node
+        return -val
+       
     def visit_assign(self, node) :
         _, var_id, value = node
         print(f'visiting assign : {var_id} = {value}')
@@ -188,10 +192,11 @@ class AstVisitor :
             array_size = size[1]
         elif isinstance(size, tuple) and size[0] == 'var':
             size_var = size[1]
-            print("CACA")
             if not self.sym_table.exist(size_var) :
                 raise Exception(f'size variable {size_var} does not exist')
             array_size = self.sym_table.lookup(size_var)["Value"]
+            if array_size < 1 :
+                raise Exception(f'cannot use {array_size} as an array size, as it is negative')
         
         else:
             raise Exception("Invalid size")
@@ -326,13 +331,22 @@ class AstVisitor :
     def visit_arithExpr_binOp(self, node) :
         _, left, operator, right = node
         print(f"visiting arithmetic operation: {left} {operator} {right}")
-        
-        left_val = left[1] #'number'
-        right_val = right[1] #'number'
-        
+        if left[0] == 'number' :
+            left_val = left[1]
+            
+        elif left[0] == 'negnumber' : 
+            left_val = -left[2] #for negatives
+           
+         
+        if right[0] == "number" : 
+            right_val = right[1] 
+            
+        elif right[0] == 'negnumber' :
+            right_val = -right[2]
+            
         
         if isinstance(left_val, str):
-            left_val = self.sym_table.lookup(left_val)["Value"]
+            left_val =  self.sym_table.lookup(left_val)["Value"]
         
         if isinstance(right_val, str) :
             right_val = self.sym_table.lookup(right_val)["Value"]
@@ -343,8 +357,8 @@ class AstVisitor :
         
         _, left, operator, right = node
         
-        left_val = left[1] #'number'
-        right_val = right[1] #'number'
+        left_val = left[1] 
+        right_val = right[1] 
         
         
         if isinstance(left_val, str):

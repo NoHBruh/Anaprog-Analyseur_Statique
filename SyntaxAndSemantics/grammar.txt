@@ -21,14 +21,16 @@ returnStmt ::= "return" expr ";"
 expr ::= arithExpr | boolExpr |  identifier "[" arithExpr "]" | identifier "[" "]"
 arithExpr ::= arithExpr op arithExpr| noprnd
 boolExpr ::= boolExpr rop boolExpr| boprnd
-noprnd ::= var | num
+noprnd ::= var | num | negnum
 boprnd ::= var | "True" | "False"
 op ::= "+" | "-" | "*" | "/"
 rop ::= "<" | ">" | "==" | "!=" | ">=" | "<=" | "and" | "or"
 
 var ::= identifier
 funcCall ::= identifier
-num ::= digit+
+num ::= digit+ | 
+negnum ::= "-"digit+
+
 identifier ::= letter (letter | digit)*
 letter ::= "a" | "b" | "c" | ... | "z" | "A" | "B" | "C" | ... | "Z"
-digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" 

@@ -142,9 +142,11 @@ def p_noprnd_var(p) :
 
 
 def p_noprnd_num(p) :
-    '''noprnd : NUMBER'''
-    p[0] = ('number', p[1])
-    
+    '''noprnd : NUMBER
+                | MINUS NUMBER'''
+    if len(p) == 2 :
+        p[0] = ('number', p[1])
+    else : p[0] = ('negnumber', p[1], p[2])
     
 def p_boprnd_true(p) :
     '''boprnd : TRUE'''
