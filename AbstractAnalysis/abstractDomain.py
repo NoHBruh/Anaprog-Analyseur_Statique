@@ -17,8 +17,8 @@ class AbstractDomain(Enum) :
                T
             /    \
            N       NN
-         / | \      /
-         P U  N    /
-         \ \  \   /
+         / | \ \      /
+         P U N  Z  /
+         \ \  \ |  /
                 ⊥
     """
