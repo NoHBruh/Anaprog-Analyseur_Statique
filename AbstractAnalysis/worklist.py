@@ -1,7 +1,8 @@
 from abstract_flow import AbstractEnvironment
 from abstractDomain import AbstractDomain
 from .warnings import Warnings, WarningType
-from utils import get_operator_to_string, ops
+from utils import ops, num_to_string, bool_ops_reverse
+import copy
 class Worklist:
     def __init__(self):
         self.array_sizes = {} # used for keeping tracks of array sizes, facilitates checking when using a constant as index
@@ -65,7 +66,7 @@ class Worklist:
         _, stmt_list = node
         for stmt in stmt_list :
             self.visit(stmt)
-        return self.abstract_environement
+        return self.abstract_environement.abs_env
     
     def visit_number(self, node) :
         _, val = node
@@ -99,7 +100,7 @@ class Worklist:
         _, array_id, size = node
         
         match size :
-            case ('negnum',_, const) :
+            case ('negnumber',_, const) :
                 self.warnings.add_warning(WarningType.ERROR, f"constant {const} is negative and cannot be used as an array size")
                 self.array_sizes[array_id] = -const
                 print(f"added array {array_id} with size {const}")
@@ -124,8 +125,128 @@ class Worklist:
                 self.array_sizes[array_id] = abstract_val    
                 print(f"added array {array_id} with abstract size {abstract_val}")
     
+    def visit_array_assign(self, node) :
+        # i.e z[5] = 4
+        _, array_id, index, _ = node
+        
+        if array_id not in self.array_sizes.keys() :
+            self.warnings.add_warning(WarningType.ERROR, f"trying to update value of an array {array_id} that does not exist")
+            return
+        array_size = self.array_sizes[array_id]
+        match index:
+            
+            case ('number', value) :
+                
+                if value > AbstractDomain.TOP :
+                    self.warnings.add_warning(WarningType.ERROR, f"trying to write more in array {array_id} than maximum that is allowed") 
+
+                if array_size not in AbstractDomain and value > array_size :
+                    self.warnings.add_warning(WarningType.ERROR, f'Trying to write in array {array_id} at index {value} when its max size is {array_size}')  
+                    
+            case('boprnd', bool_const) :
+                self.warnings.add_warning(WarningType.ERROR, f"index {bool_const} is invalid (boolean)  with array {array_id}")      
+
+            case('negnumber', _, _) :
+                self.warnings.add_warning(WarningType.ERROR, f' trying to write in array {array_id} at a negative index, will cause an error')
+            
+            case ('var', var_id) :
+                if var_id not in self.abstract_environement.abs_env.keys() :
+                    self.warnings.add_warning(WarningType.ERROR, f'trying to write in array {array_id} at index variable {var_id} that does not exist')
+                    return
+                    
+                var_abs_val = self.abstract_environement.abs_env[var_id]
+                
+                if var_abs_val == AbstractDomain.NOTNUMERIC :
+                    self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is boolean and trying to write in array {array_id} will cause an error')
+                
+                elif array_size == var_abs_val == AbstractDomain.POSITIVE :
+                    self.warnings.add_warning(WarningType.WARNING, f'index variable {var_id} may be bigger than array {array_id} size')
+                    
+                elif var_abs_val == AbstractDomain.NEGATIVE :
+                    self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is negative and trying to write in array {array_id} is invalid')
+                
+                elif var_abs_val == AbstractDomain.UNSURE and array_size in {AbstractDomain.POSITIVE, AbstractDomain.UNSURE} :
+                    self.warnings.add_warning(WarningType.WARNING, f'variable index {var_id} could be invalid to use with array {array_id}')
+                    
+            
+    def visit_array_expr(self, node) :
+        # i.e z = array[8]
+        _, array_id, index = node
+        
+        if array_id not in self.array_sizes.keys() :
+            self.warnings.add_warning(WarningType.ERROR, f"trying to access value of an array {array_id} that does not exist")
+            return
+        
+        array_size = self.array_sizes[array_id]
+        match index:
+            
+            case ('number', value) :
+                
+                if value > AbstractDomain.TOP :
+                    self.warnings.add_warning(WarningType.ERROR, f"trying to access array {array_id} further than what is allowed")
+                
+                if array_size not in AbstractDomain and value > array_size :
+                    self.warnings.add_warning(WarningType.ERROR, f'Trying to write in array {array_id} at index {value} when its max size is {array_size}')        
+
+            case('boprnd', bool_const) :
+                self.warnings.add_warning(WarningType.ERROR, f"index {bool_const} is invalid (boolean), will not access {array_id}")
+
+            case('negnumber', _, _) :
+                self.warnings.add_warning(WarningType.ERROR, f' trying to write in array {array_id} at a negative index, will cause an error')
+            
+            case ('var', var_id) :
+                if var_id not in self.abstract_environement.abs_env.keys() :
+                    self.warnings.add_warning(WarningType.ERROR, f'trying to write in array {array_id} at index variable {var_id} that does not exist')
+                    return
+                    
+                var_abs_val = self.abstract_environement.abs_env[var_id]
+                
+                if var_abs_val == AbstractDomain.NOTNUMERIC :
+                    self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is boolean and trying to access array {array_id} will cause an error')
+                
+                elif array_size == var_abs_val == AbstractDomain.POSITIVE :
+                    self.warnings.add_warning(WarningType.WARNING, f'index variable {var_id} may be bigger than array {array_id} size')
+                    
+                elif var_abs_val == AbstractDomain.NEGATIVE :
+                    self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is negative and trying to access array {array_id} is invalid')
+                
+                elif var_abs_val == AbstractDomain.UNSURE and array_size in {AbstractDomain.POSITIVE, AbstractDomain.UNSURE} :
+                    self.warnings.add_warning(WarningType.WARNING, f'variable index {var_id} could be invalid to use with array {array_id}')
+        
+        
+    def visit_if(self, node) :
+        _, bool_stmt, then, _else = node
+        match bool_stmt :
+            case (_, oprnd1, op, oprnd2) :
+                self.conditions.append((oprnd1[1], op, oprnd2[1])) 
+        
+        pred_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
+        
+        self.abstract_environement.conditions_handler(self.conditions)
+        
+        self.visit(then)
+        then_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
+        
+        #restore abstract_env old state for else branch visit
+        self.abstract_environement.abs_env = pred_abs_env
+        
+        if_cond = self.conditions.pop()
+        else_cond = (if_cond[0], bool_ops_reverse[if_cond[1]], if_cond[2])
+        self.conditions.append(else_cond)
+        
+        self.abstract_environement.conditions_handler(self.conditions)
+        
+        self.visit(_else)
+        else_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
+        
+        #joining then and else abstract env
+        self.abstract_environement.join(then_abs_env, else_abs_env)
+        
+        self.conditions.pop()
+        
+        
     def process_arithmetic_worklist(self, var_symbol, oprnd1, op, oprnd2) :
-        op = get_operator_to_string(op)
+        op = num_to_string[op]
         
         match (oprnd1, oprnd2):
             case (('num', val1), ('num', val2)) :
