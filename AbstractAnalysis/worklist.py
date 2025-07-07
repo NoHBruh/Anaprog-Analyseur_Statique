@@ -10,6 +10,7 @@ class Worklist:
         self.conditions = []
         self.warnings = Warnings()
         self.work_list = []
+        self.abs_env_collection = {}
         
     def visit(self, node):
         """intermediate visitor for call the right one on the current node
@@ -116,7 +117,7 @@ class Worklist:
                 
             case('var', var_id) :
                 abstract_val = self.abstract_environement.abs_env[var_id]
-                if (abstract_val == AbstractDomain.NEGATIVE) :
+                if (abstract_val == AbstractDomain.NEGATIVE or abstract_val < 0) :
                     self.warnings.add_warning(WarningType.ERROR, f"variable {var_id} is negative and cannot be used as an array size")
                     
                 elif (abstract_val == AbstractDomain.NOTNUMERIC) :
@@ -155,6 +156,15 @@ class Worklist:
                     return
                     
                 var_abs_val = self.abstract_environement.abs_env[var_id]
+                is_concrete = var_abs_val not in AbstractDomain
+                is_invalid_index = self.array_sizes[array_id] > 0 and not (var_abs_val > 0 and var_abs_val <= self.array_sizes[array_id])
+                
+                if is_concrete :
+                    if var_abs_val < 0 :
+                        self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is negative, cannot write in array {array_id}')
+                    
+                    elif is_invalid_index :
+                        self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is bigger than array max size, cannot write')
                 
                 if var_abs_val == AbstractDomain.NOTNUMERIC :
                     self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is boolean and trying to write in array {array_id} will cause an error')
