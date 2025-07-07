@@ -15,10 +15,12 @@ class AbstractDomain(Enum) :
     """     Latice
           -----------  
                T
-            /    \
-           N       NN
-         / | \ \      /
-         P U N  Z  /
-         \ \  \ |  /
-                ⊥
+           / / |  \
+          / /  /   NN
+         / |  |    /
+         P N  Z   /
+         \ |  /  /
+           U    /
+            \  /
+              ⊥
     """
