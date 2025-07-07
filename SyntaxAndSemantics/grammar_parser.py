@@ -184,8 +184,8 @@ def p_boolExpr_binOp(p):
                 | arithExpr GTE arithExpr
                 | arithExpr DEQUAL arithExpr
                 | arithExpr NEQUAL arithExpr
-                | arithExpr AND arithExpr
-                | arithExpr OR arithExpr
+                | boolExpr AND boolExpr
+                | boolExpr OR boolExpr
                 | boprnd'''
     if len(p) == 2:
         p[0] = p[1]
