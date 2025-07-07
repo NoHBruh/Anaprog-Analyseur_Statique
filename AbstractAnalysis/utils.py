@@ -2,6 +2,12 @@ from abstractDomain import AbstractDomain
 import operator
 ops = { "+": operator.add, "-": operator.sub, '*' : operator.mul, '/' : operator.truediv }
 num_to_string = { '+': "sum", '-': 'sub', '*' : 'mult' , '/' : 'div'}
+bool_ops_reverse = {'==' : "!=",
+                    '!=' : '==',
+                    '<' : '>', 
+                    '>' : '<', 
+                    '>=' : '<=',
+                    '<=' : '>='}
 
 def handle_arithmetic_variables(var1, op, var2) :
     match op:
@@ -185,6 +191,4 @@ def get_abstract_val_div_const_left(var, const) :
     
 #//--------------------------\\
     
-def get_operator_to_string(op) :
-    return num_to_string[op]
 
