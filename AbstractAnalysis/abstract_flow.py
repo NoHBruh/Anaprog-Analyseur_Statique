@@ -22,8 +22,14 @@ class AbstractEnvironment :
         elif (value < 0):
             self.abs_env[symbol] = AbstractDomain.NEGATIVE
             
-        else : 
-            self.abs_env[symbol] = value  #not abstract value, we can make an easy check on value if used as an array index
+        elif value == 0 : 
+            self.abs_env[symbol] = AbstractDomain.ZERO 
+            
+        elif value > 0 :
+            self.abs_env[symbol] = AbstractDomain.POSITIVE
+            
+        else :
+            self.abs_env[symbol] = AbstractDomain.TOP
         
     
     def variable_assign_flow_function(self, symbol, assigned_variable):
@@ -119,6 +125,22 @@ class AbstractEnvironment :
             raise Exception("variable not in abstract environment")   
         
         self.abs_env[symbol] = handle_arithmetic_with_constant_left(constant, '/' ,self.abs_env[assigned_variable])
+        
+        
+#----------------ApplyingConditions-------------------------        
+    def conditions_handler(self, conditions) :
+           for cond in conditions :
+               match cond:
+                   case (oprnd1, op, oprnd2) :
+                       if oprnd1 in self.abs_env and oprnd2 in self.abs_env :
+                           self.variables_condition_applier(oprnd1, op, oprnd2)
+                           
+                       elif oprnd1 in self.abs_env and oprnd2 not in self.abs_env :
+                           self.var_const_condition_applier(oprnd1, op, oprnd2) 
+                        
+                       elif oprnd1 not in self.abs_env and oprnd2 in self.abs_env :
+                           self.const_var_condition_applier(oprnd1, op, oprnd2) 
+
         
         
 #------------Join_And_Widening_Operations-------------------------
