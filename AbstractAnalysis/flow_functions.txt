@@ -1,8 +1,10 @@
-f[[x = c]](ϕ) = ϕ [x -> P] if c >0
+f[[x = c]](ϕ) = ϕ [x -> c] if c >0
                 ϕ [x -> Z] if c = 0
                 ϕ [x -> N] if c < 0
                 ϕ [x -> NN] if c = True or c = False
                 ϕ [x -> BOTTOM] otherwise
+
+f[[x = c ⊕ d ]](ϕ) = ϕ [x -> c ⊕ d]
 
 f[[x = c + d]](ϕ) = ϕ [x -> P] if c >0 and d >0
                 ϕ [x -> Z] if c = -d or c = d = 0
