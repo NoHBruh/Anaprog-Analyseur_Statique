@@ -26,7 +26,7 @@ class AbstractEnvironment :
             self.abs_env[symbol] = AbstractDomain.ZERO 
             
         elif value > 0 :
-            self.abs_env[symbol] = AbstractDomain.POSITIVE
+            self.abs_env[symbol] = value
             
         else :
             self.abs_env[symbol] = AbstractDomain.TOP
