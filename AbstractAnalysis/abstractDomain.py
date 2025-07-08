@@ -3,11 +3,11 @@ from sys import maxsize
 
 class AbstractDomain(Enum) :
     TOP = maxsize #maximum size of a data structure
-    NUMERIC = "N"
+    
     POSITIVE = "P"
     ZERO = 0
     NEGATIVE = "N"
-    UNSURE = "U" 
+    UNSURE = "U" #Unsure of integer value
     NOTNUMERIC = "NN" # booleans (float and decimals are not handled by SMALL)
     BOTTOM = -maxsize #minimum value
     
@@ -15,12 +15,12 @@ class AbstractDomain(Enum) :
     """     Latice
           -----------  
                T
-           / / |   \
-          / /  /   NN
-         / |  |    /
+            /    \
+           U     NN
+         / |  \    /
          P N  Z   /
-         \ |  /  /
-           U    /
-            \  /
-              ⊥
+        \  |  /  /
+         \ |  /
+          \ | /
+            ⊥
     """
