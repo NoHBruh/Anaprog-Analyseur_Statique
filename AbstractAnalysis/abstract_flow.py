@@ -1,5 +1,6 @@
 from .abstractDomain import AbstractDomain
 from utils import handle_arithmetic_variables, handle_arithmetic_with_constant_right, handle_arithmetic_with_constant_left
+from utils import handle_concrete_val_least_upper_bound, handle_abstract_val_least_upper_bound, handle_var_const_least_upper_bound
 
 class AbstractEnvironment :
     def __init__(self):
@@ -20,7 +21,7 @@ class AbstractEnvironment :
         if value in {True, False} :
             self.abs_env[symbol] = AbstractDomain.NOTNUMERIC
         elif (value < 0):
-            self.abs_env[symbol] = AbstractDomain.NEGATIVE
+            self.abs_env[symbol] = -value
             
         elif value == 0 : 
             self.abs_env[symbol] = AbstractDomain.ZERO 
@@ -145,3 +146,23 @@ class AbstractEnvironment :
         
 #------------Join_And_Widening_Operations-------------------------
 
+    def join(self ,abs_env1, abs_env2):
+        result = None
+        for var in abs_env1:
+            if var in abs_env2 :
+                val1 = abs_env1[var]
+                val2 = abs_env2[var]
+                
+                if val1 not in AbstractDomain and val2 not in AbstractDomain :
+                    result = handle_concrete_val_least_upper_bound(val1, val2)
+
+                elif val1 in AbstractDomain and val2 in AbstractDomain :
+                    result = handle_abstract_val_least_upper_bound(val1, val2)
+                    
+                #only one value is abstract    
+                elif val1 in AbstractDomain != val2 in AbstractDomain : 
+                    result = handle_var_const_least_upper_bound(val1, val2)
+
+                self.abs_env[var] = result
+            
+            
