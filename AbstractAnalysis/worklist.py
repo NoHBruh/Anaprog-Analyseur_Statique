@@ -157,7 +157,12 @@ class Worklist:
                     
                 var_abs_val = self.abstract_environement.abs_env[var_id]
                 is_concrete = var_abs_val not in AbstractDomain
-                is_invalid_index = self.array_sizes[array_id] > 0 and not (var_abs_val > 0 and var_abs_val <= self.array_sizes[array_id])
+                
+                is_concrete_array_size = self.array_sizes[array_id] not in AbstractDomain
+                is_invalid_index = None
+                
+                if is_concrete_array_size:
+                    is_invalid_index = self.array_sizes[array_id] > 0 and var_abs_val > 0 and var_abs_val > self.array_sizes[array_id]
                 
                 if is_concrete :
                     if var_abs_val < 0 :
@@ -212,6 +217,11 @@ class Worklist:
                     return
                     
                 var_abs_val = self.abstract_environement.abs_env[var_id]
+                is_concrete = var_abs_val not in AbstractDomain
+                
+                if array_size not in AbstractDomain and is_concrete :
+                    if var_abs_val > 0 and var_abs_val > array_size :
+                        self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is bigger than size {array_size} of array {array_id}, cannot access value')
                 
                 if var_abs_val == AbstractDomain.NOTNUMERIC :
                     self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is boolean and trying to access array {array_id} will cause an error')
