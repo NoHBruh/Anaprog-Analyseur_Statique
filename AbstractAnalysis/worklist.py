@@ -177,7 +177,9 @@ class Worklist:
                 
                 elif var_abs_val == AbstractDomain.UNSURE and array_size in {AbstractDomain.POSITIVE, AbstractDomain.UNSURE} :
                     self.warnings.add_warning(WarningType.WARNING, f'variable index {var_id} could be invalid to use with array {array_id}')
-                    
+                
+                elif var_abs_val == AbstractDomain.TOP :
+                    self.warnings.add_warning(WarningType.WARNING(f'variable index {var_id} may be bigger than array {array_id} size'))    
             
     def visit_array_expr(self, node) :
         # i.e z = array[8]
@@ -222,6 +224,9 @@ class Worklist:
                 
                 elif var_abs_val == AbstractDomain.UNSURE and array_size in {AbstractDomain.POSITIVE, AbstractDomain.UNSURE} :
                     self.warnings.add_warning(WarningType.WARNING, f'variable index {var_id} could be invalid to use with array {array_id}')
+                    
+                elif var_abs_val == AbstractDomain.TOP :
+                    self.warnings.add_warning(WarningType.WARNING, f'variabe index {var_id} could be bigger and not access array {array_id}')
         
         
     def visit_if(self, node) :
