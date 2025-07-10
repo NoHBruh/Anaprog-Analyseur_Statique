@@ -60,6 +60,20 @@ class Worklist:
         
         for stmt in stmt_list :
             self.visit(stmt)
+     
+    def visit_function(self, node) :
+        try:
+            _, function_id, param_list, stmt_list = node
+            print(f'visiting function {function_id}')
+            for param in param_list:
+                self.abstract_environement.abs_env[param[1]] = AbstractDomain.BOTTOM
+            
+            for stmt in stmt_list :
+                self.visit(stmt)
+        except ValueError:
+            print(f"Invalid function node : {node}")
+            return 
+     
             
             
     def visit_sequence(self, node) :
