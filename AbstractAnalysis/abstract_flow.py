@@ -1,4 +1,4 @@
-from .abstractDomain import AbstractDomain
+from abstractDomain import AbstractDomain
 from utils import handle_arithmetic_variables, handle_arithmetic_with_constant_right, handle_arithmetic_with_constant_left
 from utils import handle_concrete_val_least_upper_bound, handle_abstract_val_least_upper_bound, handle_var_const_least_upper_bound
 
@@ -31,13 +31,14 @@ class AbstractEnvironment :
             
         else :
             self.abs_env[symbol] = AbstractDomain.TOP
+            
+        print(f'added symbol {symbol} with value {value} in abstract env')
         
     
     def variable_assign_flow_function(self, symbol, assigned_variable):
         """ var symbol = var assigned_variable"""
         if assigned_variable not in self.abs_env:
             raise Exception("variable not in abstract environment")
-        
         self.abs_env[symbol] = self.abs_env[assigned_variable]
         print(f"Updated variable '{symbol}' in abstract environment to value of: {assigned_variable}")
         
