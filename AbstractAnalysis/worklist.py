@@ -1,6 +1,6 @@
 from abstract_flow import AbstractEnvironment
 from abstractDomain import AbstractDomain
-from .warnings import Warnings, WarningType
+from my_warnings import Warnings, WarningType
 from utils import ops, num_to_string, bool_ops_reverse
 import copy
 class Worklist:
@@ -66,7 +66,7 @@ class Worklist:
             _, function_id, param_list, stmt_list = node
             print(f'visiting function {function_id}')
             for param in param_list:
-                self.abstract_environement.abs_env[param[1]] = AbstractDomain.BOTTOM
+                self.abstract_environement.abs_env[param[1]] = AbstractDomain.TOP
             
             for stmt in stmt_list :
                 self.visit(stmt)
@@ -83,6 +83,11 @@ class Worklist:
             self.visit(stmt)
         return self.abstract_environement.abs_env
     
+    def visit_return(self, node) :
+        _, return_val = node
+        print(f'returning {node}')
+        self.visit(return_val)
+    
     def visit_number(self, node) :
         _, val = node
         return val
@@ -95,21 +100,25 @@ class Worklist:
         _, var_id, value = node
         print(f'visiting assign : {var_id} = {value}')
         node_name = value[0]
+        
+        if node_name == 'negnumber' :
+            self.abstract_environement.constant_assign_flow_function(var_id, -value[2])
+            
         val = value[1]
-        if node_name == 'num' :
+        if node_name == 'number' :
             self.abstract_environement.constant_assign_flow_function(var_id, val)
             
         elif node_name == 'var' :
             self.abstract_environement.variable_assign_flow_function(var_id, val)
         
-        elif node_name == "arithExpr":
+        elif node_name == "arithExpr_binOp":
             oprnd1, op, oprnd2 = value[1:]
-
+            print(value[1:])
             self.process_arithmetic_worklist(var_id, oprnd1, op, oprnd2)
             
         elif node_name == 'array_expr' :
             self.visit(value)
-            
+           
             
     def visit_array_create(self, node) :
         _, array_id, size = node
@@ -121,9 +130,9 @@ class Worklist:
                 print(f"added array {array_id} with size {const}")
             
             case('number', const) :
-                if const > AbstractDomain.TOP :
-                    self.warnings.add_warning(WarningType.ERROR, "integer too large to use use as an array size")
-                    return
+                #if const > AbstractDomain.TOP :
+                 #   self.warnings.add_warning(WarningType.ERROR, "integer too large to use use as an array size")
+                 #   return
                 self.array_sizes[array_id] = const
                 
             case('boprnd', bool_const) :
@@ -152,8 +161,8 @@ class Worklist:
             
             case ('number', value) :
                 
-                if value > AbstractDomain.TOP :
-                    self.warnings.add_warning(WarningType.ERROR, f"trying to write more in array {array_id} than maximum that is allowed") 
+                #if value > AbstractDomain.TOP :
+                 #   self.warnings.add_warning(WarningType.ERROR, f"trying to write more in array {array_id} than maximum that is allowed") 
 
                 if array_size not in AbstractDomain and value > array_size :
                     self.warnings.add_warning(WarningType.ERROR, f'Trying to write in array {array_id} at index {value} when its max size is {array_size}')  
@@ -165,7 +174,7 @@ class Worklist:
                 self.warnings.add_warning(WarningType.ERROR, f' trying to write in array {array_id} at a negative index, will cause an error')
             
             case ('var', var_id) :
-                if var_id not in self.abstract_environement.abs_env.keys() :
+                if var_id not in self.abstract_environement.abs_env :
                     self.warnings.add_warning(WarningType.ERROR, f'trying to write in array {array_id} at index variable {var_id} that does not exist')
                     return
                     
@@ -285,23 +294,23 @@ class Worklist:
         
         
     def process_arithmetic_worklist(self, var_symbol, oprnd1, op, oprnd2) :
+        arith_op = ops[op]
         op = num_to_string[op]
-        
         match (oprnd1, oprnd2):
-            case (('num', val1), ('num', val2)) :
-                self.abstract_environement.constant_assign_flow_function(var_symbol, ops[op](val1, val2))
+            case (('number', val1), ('number', val2)) :
+                self.abstract_environement.constant_assign_flow_function(var_symbol, arith_op(val1, val2))
 
-            case (('var', val1), ('num', val2)):
+            case (('var', val1), ('number', val2)):
                 flow_function_name = f'var_const_{op}_assign_flow_function'
                 flow_function = getattr(self.abstract_environement, flow_function_name)
-                flow_function(var_symbol, val1, val2)
+                return flow_function(var_symbol, val1, val2)
                 
-            case (('num', val1),('var', val2)) :
+            case (('number', val1),('var', val2)) :
                 flow_function_name = f'const_var_{op}_assign_flow_function'
                 flow_function = getattr(self.abstract_environement, flow_function_name)
-                flow_function(var_symbol, val1, val2)
+                return flow_function(var_symbol, val1, val2)
                 
             case (('var', val1), ('var', val2)):
                 flow_function_name = f'variable_{op}_assign_flow_function'
                 flow_function = getattr(self.abstract_environement, flow_function_name)
-                flow_function(var_symbol, val1, val2)
+                return flow_function(var_symbol, val1, val2)
