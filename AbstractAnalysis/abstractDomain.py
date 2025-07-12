@@ -15,7 +15,7 @@ class AbstractDomain(Enum) :
     """     Latice
           -----------  
                T
-            /    \
+            /    |
            U     NN
          / |  \    /
          P N  Z   /
