@@ -26,7 +26,10 @@ def handle_arithmetic_variables(var1, op, var2) :
             return get_abstract_val_division(var1, var2)
             
 def get_abstract_val_addition(var1, var2):
-    if (var1 == var2 == AbstractDomain.POSITIVE):
+    if var1 not in AbstractDomain and var2 not in AbstractDomain :
+        return var1 + var2
+    
+    elif (var1 == var2 == AbstractDomain.POSITIVE):
         return AbstractDomain.POSITIVE
             
     elif (var1 == var2 == AbstractDomain.ZERO):
@@ -39,7 +42,10 @@ def get_abstract_val_addition(var1, var2):
         return AbstractDomain.UNSURE
  
 def get_abstract_val_substraction(var1, var2): 
-    if (var1 == AbstractDomain.POSITIVE and var2 == AbstractDomain.NEGATIVE):
+    if var1 not in AbstractDomain and var2 not in AbstractDomain :
+        return var1 - var2
+    
+    elif (var1 == AbstractDomain.POSITIVE and var2 == AbstractDomain.NEGATIVE):
         return AbstractDomain.POSITIVE
             
     elif (var1 == AbstractDomain.NEGATIVE and var2 == AbstractDomain.POSITIVE or var1 == AbstractDomain.NEGATIVE and var2 == AbstractDomain.ZERO):
@@ -52,7 +58,10 @@ def get_abstract_val_substraction(var1, var2):
         return AbstractDomain.UNSURE 
     
 def get_abstract_val_multiplication(var1, var2):
-    if (var1  == var2 == AbstractDomain.POSITIVE or var1 == var2 == AbstractDomain.NEGATIVE):
+    if var1 not in AbstractDomain and var2 not in AbstractDomain :
+        return var1 * var2
+    
+    elif (var1  == var2 == AbstractDomain.POSITIVE or var1 == var2 == AbstractDomain.NEGATIVE):
         return AbstractDomain.POSITIVE
     
     elif ((var1 == AbstractDomain.NEGATIVE) != (var2 == AbstractDomain.NEGATIVE)) :
@@ -65,7 +74,10 @@ def get_abstract_val_multiplication(var1, var2):
         return AbstractDomain.UNSURE  
     
 def get_abstract_val_division(var1, var2):
-    if (var1 == var2 == AbstractDomain.POSITIVE or var1 == var2 == AbstractDomain.NEGATIVE) :
+    if var1 not in AbstractDomain and var2 not in AbstractDomain :
+        return var1 // var2
+    
+    elif (var1 == var2 == AbstractDomain.POSITIVE or var1 == var2 == AbstractDomain.NEGATIVE) :
         return AbstractDomain.POSITIVE
     
     elif (var1 == AbstractDomain.NEGATIVE != var2 == AbstractDomain.NEGATIVE) :
@@ -93,7 +105,7 @@ def handle_arithmetic_with_constant_right(var, op, const):
             
 def get_abstract_val_add_const_right(var, const) :
     if var not in AbstractDomain :
-        return var - const
+        return var + const
     
     if (var == AbstractDomain.POSITIVE and const >= 0) :
         return AbstractDomain.POSITIVE
