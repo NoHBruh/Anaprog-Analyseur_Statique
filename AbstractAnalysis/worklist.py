@@ -266,7 +266,7 @@ class Worklist:
         _, bool_stmt, then, _else = node
         match bool_stmt :
             case (_, oprnd1, op, oprnd2) :
-                self.conditions.append((oprnd1[1], op, oprnd2[1])) 
+                self.conditions.append((str(oprnd1[1]), op, str(oprnd2[1]))) 
         
         pred_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
         
