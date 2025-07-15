@@ -144,6 +144,78 @@ class AbstractEnvironment :
                            self.const_var_condition_applier(oprnd1, op, oprnd2) 
 
         
+   
+    def variables_condition_applier(self, var1, op, var2) :
+        if var1 not in AbstractDomain and var2 not in AbstractDomain :
+            value1 = self.abs_env[var1]
+            value2 = self.abs_env[var2]
+            
+            match op :
+                
+                case '>' :
+                    if value1 <= value2 :
+                       self.abs_env[var1] = min(value2, value1)
+                    
+                case '<' :
+                    if value1 >= value2 :
+                        self.abs_env[var1] = max(value1, value2)
+                case '>=' :
+                    if value1 < value2 :
+                        self.abs_env[var1] = value2 - 1
+                    
+                case '<=' :
+                   if value1 > value2 :
+                       self.abs_env[var1] = value1
+                    
+                case '==' :
+                    self.abs_env[var1] = value2
+   
+    def var_const_condition_applier(self, var, op, const) :
+        value = self.abs_env[var]
+        match op :
+            case '>' :
+              if value  not in AbstractDomain and value <= const  or value == AbstractDomain.BOTTOM:
+                  self.abs_env[var] = min(value, const)
+            
+            case '<' :
+                if value not in AbstractDomain and value >= const or value == AbstractDomain.TOP :
+                    self.abs_env[var] = max(value, const)
+                    
+            case '>=' :
+                if value not in AbstractDomain and value < const or value == AbstractDomain.BOTTOM :
+                    self.abs_env[var] = const - 1
+                    
+            case '<=' :
+                if value not in AbstractDomain and value > const or value == AbstractDomain.TOP :
+                    self.abs_env[var] = value 
+                    
+            case '==' :
+                self.abs_env[var] = const 
+                
+            
+    def const_var_condition_applier(self, const, op, var) :
+        value = self.abs_env[var]    
+              
+        match op :
+            case '>' :
+                if value not in AbstractDomain and const <= value or value == AbstractDomain.BOTTOM :
+                    self.abs_env[var] = max(const,value)
+                
+            case '<' :
+                if value not in AbstractDomain and const >= value or value == AbstractDomain.BOTTOM :
+                    self.abs_env[var] = min(value, const)
+                
+            case '>=' :
+                if value not in AbstractDomain and const < value or value == AbstractDomain.BOTTOM :
+                    self.abs_env[var] = value
+                
+            case '<=' :
+                if value not in AbstractDomain and const > value or value == AbstractDomain.BOTTOM :
+                    self.abs_env[var] = const - 1
+                
+            case '==' :
+                self.abs_env[var] = value
+                    
         
 #------------Join_And_Widening_Operations-------------------------
 
