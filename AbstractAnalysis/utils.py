@@ -4,10 +4,10 @@ ops = { "+": operator.add, "-": operator.sub, '*' : operator.mul, '/' : operator
 num_to_string = { '+': "sum", '-': 'sub', '*' : 'mult' , '/' : 'div'}
 bool_ops_reverse = {'==' : "!=",
                     '!=' : '==',
-                    '<' : '>', 
-                    '>' : '<', 
-                    '>=' : '<=',
-                    '<=' : '>='}
+                    '<' : '>=', 
+                    '>' : '<=', 
+                    '>=' : '<',
+                    '<=' : '>'}
 
 abs_integers = {AbstractDomain.POSITIVE, AbstractDomain.NEGATIVE, AbstractDomain.ZERO}
 
