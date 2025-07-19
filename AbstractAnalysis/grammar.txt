@@ -22,7 +22,7 @@ expr ::= arithExpr | boolExpr |  identifier "[" arithExpr "]" | identifier "[" "
 arithExpr ::= arithExpr op arithExpr| noprnd
 boolExpr ::= boolExpr rop boolExpr| boprnd
 noprnd ::= var | num | negnum
-boprnd ::= var | "True" | "False"
+boprnd ::= var | "true" | "false" 
 op ::= "+" | "-" | "*" | "/"
 rop ::= "<" | ">" | "==" | "!=" | ">=" | "<=" | "and" | "or"
 
