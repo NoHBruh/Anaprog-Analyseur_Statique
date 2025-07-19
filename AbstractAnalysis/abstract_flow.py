@@ -32,7 +32,7 @@ class AbstractEnvironment :
         else :
             self.abs_env[symbol] = AbstractDomain.TOP
             
-        print(f'added symbol {symbol} with value {value} in abstract env')
+        print(f'added symbol {symbol} with value {self.abs_env[symbol]} in abstract environment')
         
     
     def variable_assign_flow_function(self, symbol, assigned_variable):
@@ -237,5 +237,5 @@ class AbstractEnvironment :
                     result = handle_var_const_least_upper_bound(val1, val2)
 
                 self.abs_env[var] = result
-            
+                print(f'join operation done for variable {var} now with abstract value {result}')
             
