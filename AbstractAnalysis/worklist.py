@@ -83,10 +83,10 @@ class Worklist:
             self.visit(stmt)
         return self.abstract_environement.abs_env
     
-    def visit_return(self, node) :
-        _, return_val = node
-        print(f'returning {node}')
-        self.visit(return_val)
+    #def visit_return(self, node) :
+     #   _, return_val = node
+      #  print(f'returning {node}')
+       # self.visit(return_val)
     
     def visit_number(self, node) :
         _, val = node
@@ -99,13 +99,14 @@ class Worklist:
     def visit_assign(self, node) :
         _, var_id, value = node
         print(f'visiting assign : {var_id} = {value}')
+            
         node_name = value[0]
         
         if node_name == 'negnumber' :
             self.abstract_environement.constant_assign_flow_function(var_id, -value[2])
             
         val = value[1]
-        if node_name == 'number' :
+        if node_name == 'number' or node_name == 'bool' :
             self.abstract_environement.constant_assign_flow_function(var_id, val)
             
         elif node_name == 'var' :
@@ -118,7 +119,7 @@ class Worklist:
             
         elif node_name == 'array_expr' :
             self.visit(value)
-           
+          
             
     def visit_array_create(self, node) :
         _, array_id, size = node
@@ -130,9 +131,6 @@ class Worklist:
                 print(f"added array {array_id} with size {const}")
             
             case('number', const) :
-                #if const > AbstractDomain.TOP :
-                 #   self.warnings.add_warning(WarningType.ERROR, "integer too large to use use as an array size")
-                 #   return
                 self.array_sizes[array_id] = const
                 
             case('boprnd', bool_const) :
@@ -140,7 +138,7 @@ class Worklist:
                 
             case('var', var_id) :
                 abstract_val = self.abstract_environement.abs_env[var_id]
-                if (abstract_val == AbstractDomain.NEGATIVE or abstract_val < 0) :
+                if (abstract_val == AbstractDomain.NEGATIVE or abstract_val not in AbstractDomain and abstract_val < 0) :
                     self.warnings.add_warning(WarningType.ERROR, f"variable {var_id} is negative and cannot be used as an array size")
                     
                 elif (abstract_val == AbstractDomain.NOTNUMERIC) :
@@ -157,13 +155,12 @@ class Worklist:
             self.warnings.add_warning(WarningType.ERROR, f"trying to update value of an array {array_id} that does not exist")
             return
         array_size = self.array_sizes[array_id]
+        if array_size in AbstractDomain :
+            self.warnings.add_warning(WarningType.WARNING, f'trying to update an item in array {array_id} whose size is uncertain or invalid: {array_size}')
         match index:
             
             case ('number', value) :
                 
-                #if value > AbstractDomain.TOP :
-                 #   self.warnings.add_warning(WarningType.ERROR, f"trying to write more in array {array_id} than maximum that is allowed") 
-
                 if array_size not in AbstractDomain and value > array_size :
                     self.warnings.add_warning(WarningType.ERROR, f'Trying to write in array {array_id} at index {value} when its max size is {array_size}')  
                     
@@ -218,6 +215,8 @@ class Worklist:
             return
         
         array_size = self.array_sizes[array_id]
+        if array_size in AbstractDomain :
+            self.warnings.add_warning(WarningType.WARNING, f'trying to access an item in array {array_id} whose size is uncertain or invalid : {array_size}')
         match index:
             
             case ('number', value) :
@@ -266,7 +265,7 @@ class Worklist:
         _, bool_stmt, then, _else = node
         match bool_stmt :
             case (_, oprnd1, op, oprnd2) :
-                self.conditions.append((str(oprnd1[1]), op, str(oprnd2[1]))) 
+                self.conditions.append((oprnd1[1], op, oprnd2[1])) 
         
         pred_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
         
