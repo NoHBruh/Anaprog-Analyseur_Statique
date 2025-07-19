@@ -138,9 +138,14 @@ class Worklist:
                 
             case('var', var_id) :
                 abstract_val = self.abstract_environement.abs_env[var_id]
-                if (abstract_val == AbstractDomain.NEGATIVE or abstract_val not in AbstractDomain and abstract_val < 0) :
+                if abstract_val == AbstractDomain.NEGATIVE :
+                
                     self.warnings.add_warning(WarningType.ERROR, f"variable {var_id} is negative and cannot be used as an array size")
                     
+                elif abstract_val not in AbstractDomain :
+                        if abstract_val < 0 :  
+                            self.warnings.add_warning(WarningType.ERROR, f"variable {var_id} is negative and cannot be used as an array size")
+                            
                 elif (abstract_val == AbstractDomain.NOTNUMERIC) :
                     self.warnings.add_warning(WarningType.ERROR, f"variable {var_id} is a boolean and cannot be used as an array size")
                     return 
@@ -286,11 +291,83 @@ class Worklist:
         self.visit(_else)
         else_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
         
+        
+        
         #joining then and else abstract env
+        self.abstract_environement.abs_env = pred_abs_env
         self.abstract_environement.join(then_abs_env, else_abs_env)
         
         self.conditions.pop()
         
+    def visit_while(self, node):
+        _, bool_stmt, loop = node
+        
+        print('visiting while statement')
+        
+        pred_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
+        
+        match bool_stmt:
+            case('boolExpr', oprnd1, op, oprnd2) :
+                match (oprnd1, oprnd2):
+                    case(('var', var1), (_, var2)) :
+                        if var2 not in self.abstract_environement.abs_env.keys():
+                            self.abstract_environement.while_widening_handler(loop)
+                        
+                        else:
+                            val1 = self.abstract_environement.abs_env[var1]
+                            val2 = self.abstract_environement.abs_env[var2]
+                            
+                            if val1 not in AbstractDomain and val2 not in AbstractDomain :
+                                match op :
+                                    case '>' | '>=' :
+                                        iterations = val1 - val2 
+                                    
+                                    case '<' | '<=' :
+                                        iterations = val2 - val1
+                                        
+                                    case '!=' :
+                                        iterations = abs(val2 - val1)
+                                    
+                                    case _:
+                                        iterations = 0
+                                
+                                
+                                if iterations > 0 :
+                                    for i  in range(iterations):
+                                        print("\n")
+                                        print(f'loop n° {i+1}')
+                                        print("\n")
+                                        self.visit(loop)
+                                    
+                                    
+                                after_loops_abs_env = copy.deepcopy(self.abstract_environement.abs_env)
+
+                                self.abstract_environement.join(pred_abs_env, after_loops_abs_env)
+            case _ :
+                return                           
+     
+    def while_handler(self, node, iterations):
+        _, loop_stmts = node
+
+        if iterations == 0:
+            return
+        
+        for stmt in loop_stmts:
+            match stmt:
+                case('assign', var_id, value):
+                    match value:
+                        case ('arithExpr_binOp', oprnd1, op, oprnd2):
+                            for _ in range(iterations) :
+                                self.process_arithmetic_worklist(var_id, oprnd1, op, oprnd2)
+                                
+                        case _ :
+                            return
+                
+                case _: 
+                    return
+    
+    
+                                    
         
     def process_arithmetic_worklist(self, var_symbol, oprnd1, op, oprnd2) :
         arith_op = ops[op]
