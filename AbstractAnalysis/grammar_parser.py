@@ -150,12 +150,12 @@ def p_noprnd_num(p) :
     
 def p_boprnd_true(p) :
     '''boprnd : TRUE'''
-    p[0] = True
+    p[0] = ( 'bool' ,True)
    
     
 def p_boprnd_false(p) :   
      '''boprnd : FALSE'''
-     p[0] = False
+     p[0] = ('bool' ,False)
      
      
 def p_var(p) :
