@@ -86,7 +86,8 @@ def get_abstract_val_division(var1, var2):
     else :
         return AbstractDomain.UNSURE
          
-#//-------------------------\\ 
+#//---------ARITHMETICS---------------\\ 
+            
             
 def handle_arithmetic_with_constant_right(var, op, const):
     
@@ -167,7 +168,7 @@ def get_abstract_val_div_const_right(var, const) :
     else :
         return AbstractDomain.UNSURE
            
-#//--------------------------\\ 
+#//----------ARITHMETICS----------------\\ 
            
 def handle_arithmetic_with_constant_left(const, op, var) :
     match op :
@@ -221,7 +222,7 @@ def get_abstract_val_div_const_left(var, const) :
     else :
         return AbstractDomain.UNSURE
     
-#//--------------------------\\
+#//---------LeastUpperBounds-----------------\\
     
 def handle_concrete_val_least_upper_bound(var1, var2):
     if var1 > 0 and var2 > 0 :
@@ -255,9 +256,7 @@ def handle_abstract_val_least_upper_bound(var1, var2):
     
     return AbstractDomain.TOP
         
-        
-        
-        
+             
 def handle_var_const_least_upper_bound(var1, var2) :  
     if var1 == AbstractDomain.BOTTOM or var2 == AbstractDomain.BOTTOM: 
         return var1 if var1 != AbstractDomain.BOTTOM else var2 
@@ -274,7 +273,7 @@ def handle_var_const_least_upper_bound(var1, var2) :
     return AbstractDomain.TOP 
     
     
-   
-    
-    
+#//----------------------------------------\\
+
+                        
     
