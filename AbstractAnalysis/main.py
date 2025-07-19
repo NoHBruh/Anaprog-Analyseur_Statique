@@ -17,6 +17,10 @@ def main():
     
     wl = Worklist()
     wl.visit(ast)
+    print("-----------------")
+    print(" ↓↓↓ ERRORS/WARNINGS BELOW ↓↓↓ ")
+    print("\n")
+    
     
     wl.warnings.print_warnings()
     
