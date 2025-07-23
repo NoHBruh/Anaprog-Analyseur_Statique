@@ -3,71 +3,79 @@ f[[x = c]](ϕ) = ϕ [x -> c] if c >0 or c < 0
                 ϕ [x -> NN] if c = True or c = False
                 ϕ [x -> TOP] otherwise
 
+
 f[[x = c ⊕ d ]](ϕ) = ϕ [x -> c ⊕ d]
 
-f[[x = c + d]](ϕ) = ϕ [x -> P] if c >0 and d >0
-                ϕ [x -> Z] if c = -d or c = d = 0
-                ϕ [x -> N] if  c < d 
-                ϕ [x -> BOTTOM] otherwise
+f[[x = c ⊖ d ]](ϕ) = ϕ [x -> c ⊖ d]
+
+f[[x = c ⊗ d ]](ϕ) = ϕ [x -> c ⊗ d]
+
+f[[x = c ⊘ d ]](ϕ) = ϕ [x -> c ⊘ d]
 
 
-f[[x = y]](ϕ) = ϕ [x -> P] if ϕ(y) = P
-                ϕ [x -> Z] if ϕ(y) = Z
-                ϕ [x -> N] if ϕ(y) = N
-                ϕ [x -> NN] if ϕ(y) = NN
-                ϕ [x -> U] if ϕ(y) = U
-                ϕ [x -> BOTTOM] otherwise
+f[[x = y]](ϕ) = ϕ [x -> ϕ(y)]
+                
 
-f[[x = y + c]](ϕ) = ϕ [x -> P] if ϕ(y) = P and c >= 0              
+f[[x = y + c]](ϕ) = ϕ [x -> y ⊕ c] if c,ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = P and c >= 0              
                     ϕ [x -> Z] if ϕ(y) = Z and c = 0
                     ϕ [x -> N] if ϕ(y) = N and  c <= 0 
-                    ϕ [x -> U] if ϕ(y) = P and c < 0 or ϕ(y) = N and c < 0
+                    ϕ [x -> U] otherwise
 
 f[[x = c + y]](ϕ) = f[[x = y + c]](ϕ)
 
-f[[x = y - c]](ϕ) = ϕ [x -> P] if ϕ(y) = P and c <= 0              
+f[[x = y - c]](ϕ) = ϕ [x -> y ⊖ c] if c,ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = P and c <= 0              
                     ϕ [x -> Z] if ϕ(y) = Z and c = 0
                     ϕ [x -> N] if ϕ(y) = N and  c >= 0 
                     ϕ [x -> U] otherwise 
 
-f[[x = c - y]](ϕ) = ϕ [x -> P] if c > 0 and ϕ(y) = N                
+f[[x = c - y]](ϕ) = ϕ [x -> y ⊖ c] if c,ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if c > 0 and ϕ(y) = N                
                     ϕ [x -> Z] if ϕ(y) = Z and c = 0
                     ϕ [x -> N] if c < 0 and ϕ(y) = P 
                     ϕ [x -> U] otherwise 
 
-f[[x = y * c]](ϕ) = ϕ [x -> P] if ϕ(y) = P and c > 0  or ϕ(y) = N and c < 0             
+f[[x = y * c]](ϕ) = ϕ [x -> y ⊗ c] if c,ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = P and c > 0  or ϕ(y) = N and c < 0             
                     ϕ [x -> Z] if ϕ(y) = Z or c = 0
                     ϕ [x -> N] if ϕ(y) = N and c > 0 or ϕ(y) = P ans c < 0
                     ϕ [x -> U] otherwise 
 
 f[[x = c * y]](ϕ) = f[[x = y * c]](ϕ)
 
-f[[x = y / c]](ϕ) = ϕ [x -> P] if ϕ(y) = P and c > 0  or ϕ(y) = N and c < 0             
+f[[x = y / c]](ϕ) = ϕ [x -> y ⊘ c] if c,ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = P and c > 0  or ϕ(y) = N and c < 0             
                     ϕ [x -> Z] if ϕ(y) = Z and c != 0
                     ϕ [x -> N] if ϕ(y) = N xor ( c < 0 and c != 0 )
                     ϕ [x -> U] otherwise 
 
-f[[x = c / y]](ϕ) = ϕ [x -> P] if ϕ(y) = P and c > 0  or ϕ(y) = N and c < 0             
+f[[x = c / y]](ϕ) = ϕ [x -> y ⊘ c] if c,ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = P and c > 0  or ϕ(y) = N and c < 0             
                     ϕ [x -> Z] if c = 0 and ϕ(y) != Z
                     ϕ [x -> N] if ϕ(y) = N xor ( c < 0)
                     ϕ [x -> U] otherwise 
 
-f[[x = y + z]](ϕ) = ϕ [x -> P] if ϕ(y) = ϕ(z) = P
+f[[x = y + z]](ϕ) = ϕ [x -> y ⊕ z] if ϕ(z),ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = ϕ(z) = P
                     ϕ [x -> Z] if ϕ(y) = ϕ(z) = Z
                     ϕ [x -> N] if ϕ(y) = ϕ(z) = N
                     ϕ [x -> U] otherwise
 
-f[[x = y - z]](ϕ) = ϕ [x -> P] if ϕ(y) = P and ϕ(z) = N
+f[[x = y - z]](ϕ) = ϕ [x -> y ⊖ z] if ϕ(z),ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = P and ϕ(z) = N
                     ϕ [x -> N] if ϕ(y) = N and ϕ(z) = P or ϕ(y) = N and ϕ(z) = Z
                     ϕ [x -> Z] if ϕ(y) = ϕ(z) = Z
                     ϕ [x -> U] otherwise
 
-f[[x = y * z]](ϕ) = ϕ [x -> P] if ϕ(y) = P and ϕ(z) = P
+f[[x = y * z]](ϕ) = ϕ [x -> y ⊗ z] if ϕ(z),ϕ(y) ∈ ℤ
+                    ϕ [x -> P] if ϕ(y) = P and ϕ(z) = P
                     ϕ [x -> N] if ϕ(y) = N xor ϕ(z) = N
                     ϕ [x -> Z] if ϕ(y) = Z  or ϕ(z) = Z
                     ϕ [x -> U] otherwise
 
-f[[x = y / z]](ϕ) = ϕ [x -> P] if ϕ(y) = ϕ(z) = P or ϕ(y) = ϕ(z) = N
+f[[x = y / z]](ϕ) = ϕ [x -> y ⊘ z] if ϕ(z),ϕ(y) ∈ ℤ \ {0}
+                    ϕ [x -> P] if ϕ(y) = ϕ(z) = P or ϕ(y) = ϕ(z) = N
                     ϕ [x -> Z] if ϕ(y) = Z and ϕ(z) != Z
                     ϕ [x -> N] if ϕ(y) = N xor ( ϕ(z) = N and ϕ(z) != Z )
                     ϕ [x -> U] otherwise
