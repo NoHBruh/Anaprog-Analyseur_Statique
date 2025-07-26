@@ -242,7 +242,7 @@ class AbstractEnvironment :
                     result = handle_abstract_val_least_upper_bound(val1, val2)
                     
                 #only one value is abstract    
-                elif val1 in AbstractDomain != val2 in AbstractDomain : 
+                elif (val1 in AbstractDomain) ^ (val2 in AbstractDomain) : 
                     result = handle_var_const_least_upper_bound(val1, val2)
                 
                 if result != None :
