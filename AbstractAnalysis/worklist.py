@@ -83,10 +83,8 @@ class Worklist:
             self.visit(stmt)
         return self.abstract_environement.abs_env
     
-    #def visit_return(self, node) :
-     #   _, return_val = node
-      #  print(f'returning {node}')
-       # self.visit(return_val)
+    def visit_return(self, _) :
+        print(f'\n end of program, abstract environment is : {self.abstract_environement.abs_env}')
     
     def visit_number(self, node) :
         _, val = node
@@ -154,6 +152,7 @@ class Worklist:
     
     def visit_array_assign(self, node) :
         # i.e z[5] = 4
+        print('visiting array assign')
         _, array_id, index, _ = node
         
         if array_id not in self.array_sizes.keys() :
@@ -182,11 +181,11 @@ class Worklist:
                     
                 var_abs_val = self.abstract_environement.abs_env[var_id]
                 is_concrete = var_abs_val not in AbstractDomain
-                
+            
                 is_concrete_array_size = self.array_sizes[array_id] not in AbstractDomain
                 is_invalid_index = None
                 
-                if is_concrete_array_size:
+                if is_concrete_array_size and is_concrete:
                     is_invalid_index = self.array_sizes[array_id] > 0 and var_abs_val > 0 and var_abs_val > self.array_sizes[array_id]
                 
                 if is_concrete :
@@ -208,8 +207,8 @@ class Worklist:
                 elif var_abs_val == AbstractDomain.UNSURE and array_size in {AbstractDomain.POSITIVE, AbstractDomain.UNSURE} :
                     self.warnings.add_warning(WarningType.WARNING, f'variable index {var_id} could be invalid to use with array {array_id}')
                 
-                elif var_abs_val == AbstractDomain.TOP :
-                    self.warnings.add_warning(WarningType.WARNING(f'variable index {var_id} may be bigger than array {array_id} size'))    
+                elif var_abs_val in {AbstractDomain.TOP, AbstractDomain.POSITIVE}  :
+                    self.warnings.add_warning(WarningType.WARNING,(f'variable index {var_id} may be bigger than array {array_id} size'))    
             
     def visit_array_expr(self, node) :
         # i.e z = array[8]
@@ -253,13 +252,13 @@ class Worklist:
                 if var_abs_val == AbstractDomain.NOTNUMERIC :
                     self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is boolean and trying to access array {array_id} will cause an error')
                 
-                elif array_size == var_abs_val == AbstractDomain.POSITIVE :
+                elif array_size == AbstractDomain.POSITIVE or var_abs_val == AbstractDomain.POSITIVE :
                     self.warnings.add_warning(WarningType.WARNING, f'index variable {var_id} may be bigger than array {array_id} size')
                     
                 elif var_abs_val == AbstractDomain.NEGATIVE :
                     self.warnings.add_warning(WarningType.ERROR, f'variable index {var_id} is negative and trying to access array {array_id} is invalid')
                 
-                elif var_abs_val == AbstractDomain.UNSURE and array_size in {AbstractDomain.POSITIVE, AbstractDomain.UNSURE} :
+                elif var_abs_val == AbstractDomain.UNSURE or var_abs_val == AbstractDomain.UNSURE and array_size in {AbstractDomain.POSITIVE, AbstractDomain.UNSURE} :
                     self.warnings.add_warning(WarningType.WARNING, f'variable index {var_id} could be invalid to use with array {array_id}')
                     
                 elif var_abs_val == AbstractDomain.TOP :
@@ -294,11 +293,10 @@ class Worklist:
         
         
         #joining then and else abstract env
-        self.abstract_environement.abs_env = pred_abs_env
         self.abstract_environement.join(then_abs_env, else_abs_env)
         
         self.conditions.pop()
-        
+
     def visit_while(self, node):
         _, bool_stmt, loop = node
         
