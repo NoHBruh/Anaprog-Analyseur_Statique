@@ -26,11 +26,15 @@ def handle_arithmetic_variables(var1, op, var2) :
             return get_abstract_val_division(var1, var2)
             
 def get_abstract_val_addition(var1, var2):
+   
+   
     if var1 not in AbstractDomain and var2 not in AbstractDomain :
         return var1 + var2
     
     #to handle when only one variable has an abstract value 
-    elif var1 in AbstractDomain != var2 in AbstractDomain :
+    
+    elif (var1 in AbstractDomain) ^ (var2 in AbstractDomain) :
+
         return get_abstract_val_add_const_right(var1, var2) if var1 in AbstractDomain else get_abstract_val_add_const_left(var1,var2)
     
     elif (var1 == var2 == AbstractDomain.POSITIVE):
@@ -49,7 +53,7 @@ def get_abstract_val_substraction(var1, var2):
     if var1 not in AbstractDomain and var2 not in AbstractDomain :
         return var1 - var2
     
-    elif var1 in AbstractDomain != var2 in AbstractDomain :
+    elif (var1 in AbstractDomain) ^ (var2 in AbstractDomain) :
         return get_abstract_val_sub_const_right(var1, var2) if var1 in AbstractDomain else get_abstract_val_sub_const_left(var1,var2)
     
     elif (var1 == AbstractDomain.POSITIVE and var2 == AbstractDomain.NEGATIVE):
@@ -68,13 +72,13 @@ def get_abstract_val_multiplication(var1, var2):
     if var1 not in AbstractDomain and var2 not in AbstractDomain :
         return var1 * var2
     
-    elif var1 in AbstractDomain != var2 in AbstractDomain :
+    elif (var1 in AbstractDomain) ^ (var2 in AbstractDomain):
         return get_abstract_val_mult_const_right(var1, var2) if var1 in AbstractDomain else get_abstract_val_mult_const_left(var1,var2)
     
     elif (var1  == var2 == AbstractDomain.POSITIVE or var1 == var2 == AbstractDomain.NEGATIVE):
         return AbstractDomain.POSITIVE
     
-    elif ((var1 == AbstractDomain.NEGATIVE) != (var2 == AbstractDomain.NEGATIVE)) :
+    elif ((var1 == AbstractDomain.NEGATIVE) ^ (var2 == AbstractDomain.NEGATIVE)) :
         return AbstractDomain.NEGATIVE
     
     elif (var1 == var2 == AbstractDomain.ZERO):
@@ -87,13 +91,13 @@ def get_abstract_val_division(var1, var2):
     if var1 not in AbstractDomain and var2 not in AbstractDomain :
         return var1 // var2
     
-    elif var1 in AbstractDomain != var2 in AbstractDomain :
+    elif (var1 in AbstractDomain) ^ (var2 in AbstractDomain) :
         return get_abstract_val_div_const_right(var1, var2) if var1 in AbstractDomain else get_abstract_val_div_const_left(var1,var2)
     
     elif (var1 == var2 == AbstractDomain.POSITIVE or var1 == var2 == AbstractDomain.NEGATIVE) :
         return AbstractDomain.POSITIVE
     
-    elif (var1 == AbstractDomain.NEGATIVE != var2 == AbstractDomain.NEGATIVE) :
+    elif (var1 == AbstractDomain.NEGATIVE) ^ (var2 == AbstractDomain.NEGATIVE) :
         return AbstractDomain.NEGATIVE
     
     else :
@@ -175,7 +179,7 @@ def get_abstract_val_div_const_right(var, const) :
     elif (var == AbstractDomain.ZERO and const != 0) :
         return AbstractDomain.ZERO
     
-    elif (var == AbstractDomain.NEGATIVE != (const < 0 and const != 0)) :
+    elif (var == AbstractDomain.NEGATIVE) ^ (const < 0 and const != 0) :
         return AbstractDomain.NEGATIVE
     
     else :
@@ -229,7 +233,7 @@ def get_abstract_val_div_const_left(var, const) :
     elif (const == 0 and var != AbstractDomain.ZERO) :
         return AbstractDomain.ZERO
     
-    elif (const < 0 != var == AbstractDomain.NEGATIVE) :
+    elif (const < 0)  ^ (var == AbstractDomain.NEGATIVE) :
         return AbstractDomain.NEGATIVE
     
     else :
@@ -247,12 +251,15 @@ def handle_concrete_val_least_upper_bound(var1, var2):
     elif var1 == var2 == 0  or var1 == -var2:
         return AbstractDomain.ZERO
     
-    elif var1 > 0 != var2 > 0 :
+    elif var1 >= 0 and var2 < 0 or var1 < 0 and var2 >=0 :
         return AbstractDomain.UNSURE
+    
+    return AbstractDomain.TOP
+    
     
 def handle_abstract_val_least_upper_bound(var1, var2):
     
-    if var1 == AbstractDomain.BOTTOM != var2 == AbstractDomain.BOTTOM :
+    if (var1 == AbstractDomain.BOTTOM) ^ (var2 == AbstractDomain.BOTTOM) :
         return var1 if var1 != AbstractDomain.BOTTOM else var2
     
     elif var1 in abs_integers and var2 in abs_integers  :
