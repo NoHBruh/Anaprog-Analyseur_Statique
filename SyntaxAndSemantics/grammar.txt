@@ -6,7 +6,7 @@ paramlist ::= param | param "," paramlist | ɛ
 param ::= identifier | num
 
 stmtlist ::= stmt*
-stmt ::= assign_val | assign_func_call | if | while | sequence | returnStmt | array_create | array_assign
+stmt ::= assign_val | assign_func_call | if | while | sequence | returnStmt | array_create | array_assign 
 
 assign_val ::= identifier "=" expr ";"
 assign_func_call ::= identifier "=" "call" identifier "(" [paramlist] ")" ";"

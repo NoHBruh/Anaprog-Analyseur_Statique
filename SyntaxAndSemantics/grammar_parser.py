@@ -50,11 +50,14 @@ def p_param(p):
     
 def p_stmtlist(p):
     '''stmtlist : stmt
-                | stmt stmtlist'''
-    if len(p) == 2 :
+                | stmt stmtlist
+                | empty'''
+    if len(p) == 2  and p[1] is not None:
         p[0] = [p[1]]
-    else:
+    elif len(p) > 2:
         p[0] = [p[1]] + p[2]
+    else :
+        p[0] = []
         
 def p_stmt(p):
     '''stmt : assign_val
@@ -91,7 +94,7 @@ def p_array_assign(p):
     p[0] = ('array_assign', array_name, index, p[6])
     
 def p_if(p):
-    '''stmt : IF LPAR expr RPAR stmt ELSE stmt'''
+    '''stmt : IF LPAR boolExpr RPAR stmt ELSE stmt'''
     p[0] = ('if', p[3], p[5], p[7])
     
     
@@ -150,13 +153,18 @@ def p_noprnd_num(p) :
     
 def p_boprnd_true(p) :
     '''boprnd : TRUE'''
-    p[0] = True
-   
+                
+    p[0] = ('bool', True)
     
-def p_boprnd_false(p) :   
-     '''boprnd : FALSE'''
-     p[0] = False
-     
+def p_boprnd_false(p) :
+    '''boprnd : FALSE'''
+                
+    p[0] = ('bool', False)
+   
+def p_boprnd_var(p) :
+    """boprnd : var"""
+    p[0] = p[1]
+
      
 def p_var(p) :
     '''var : IDENTIFIER'''
@@ -184,6 +192,8 @@ def p_boolExpr_binOp(p):
                 | arithExpr GTE arithExpr
                 | arithExpr DEQUAL arithExpr
                 | arithExpr NEQUAL arithExpr
+                | boprnd DEQUAL boprnd
+                | boprnd NEQUAL boprnd
                 | boolExpr AND boolExpr
                 | boolExpr OR boolExpr
                 | boprnd'''

@@ -1,5 +1,5 @@
 import re # used for RegEx rules declaration using 't_' prefix
-import ply.lex as lex
+from ply import lex
 
 #-----Tokens-----
 
@@ -11,8 +11,8 @@ reserved_words = {
     'function' : 'FUNCTION',
     'main' : 'MAIN',
     
-    'true' : 'TRUE',
-    'false' : 'FALSE',
+    'True' : 'TRUE',
+    'False' : 'FALSE',
     
     'new' : 'NEW',
     'array' : 'ARRAY',
@@ -78,8 +78,8 @@ t_GTE = r'>='
 t_EQUAL = r'='
 t_NEQUAL = r'!='
 t_DEQUAL = r'=='
-t_AND = r'\&'
-t_OR = r'\|'
+t_AND = r'and'
+t_OR = r'or'
 t_LPAR = r'\('
 t_RPAR = r'\)'
 t_LBRACE = r'\{'

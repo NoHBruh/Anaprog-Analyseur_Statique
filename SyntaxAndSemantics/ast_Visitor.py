@@ -75,6 +75,8 @@ class AstVisitor :
         self.sym_table.new_scope()
         for stmt in stmt_list :
             self.visit(stmt)
+            if stmt[0] == 'return' :
+                break
         self.sym_table.leave_scope()
         
     #---------------------------------------------    
@@ -96,7 +98,11 @@ class AstVisitor :
     def visit_negnumber(self, node) :
         _, _ , val = node
         return -val
-       
+    
+    def visit_bool(self, node):
+        _, val = node
+        return val
+      
     def visit_assign(self, node) :
         _, var_id, value = node
         print(f'visiting assign : {var_id} = {value}')
@@ -123,7 +129,11 @@ class AstVisitor :
             return
         
         #Variable assignment
-        val = self.visit(value)
+        val = None
+        if value in {True, False} :
+            val = value
+        else:    
+            val = self.visit(value)
         
         if not self.sym_table.exist(var_id):
             if (isinstance(val, list)):
@@ -274,7 +284,9 @@ class AstVisitor :
     def visit_if(self, node) :
         _, bool_stmt, then, _else = node
         
+        print(f'visiting if condition : {bool_stmt}')
         stmt_eval = self.visit(bool_stmt)
+        print(f' VALUE BOOL : {stmt_eval}')
         
         if stmt_eval :
             self.visit(then)
@@ -287,6 +299,8 @@ class AstVisitor :
         
         loop = loop[1]
         self.sym_table.new_scope()
+        if bool_stmt[0] == 'bool' and bool_stmt[1] == True :
+            raise Exception('Infinite While loop, operation unallowed')
         while self.visit(bool_stmt):
             for stmt in loop :
                 self.visit(stmt)
@@ -334,21 +348,24 @@ class AstVisitor :
         if left[0] in {'number','var'} :
             left_val = left[1]
             
-        elif left[0] == 'negnumber' : 
+        elif utils.is_negnumber(left): 
             left_val = -left[2] #for negatives
            
          
         if right[0] in {'number','var'} : 
             right_val = right[1] 
             
-        elif right[0] == 'negnumber' :
+        elif utils.is_negnumber(right):
             right_val = -right[2]
-            
+         
+        elif right[0] == "arithExpr_binOp" :
+            right_val = self.visit(right)   
+             
         #lookup for variable values in sym_tab
         if isinstance(left_val, str):
             left_val =  self.sym_table.lookup(left_val)["Value"]
         
-        if isinstance(right_val, str) :
+        elif isinstance(right_val, str) :
             right_val = self.sym_table.lookup(right_val)["Value"]
             
         return utils.process_arith_binOp(left_val, operator, right_val)
@@ -357,9 +374,18 @@ class AstVisitor :
         
         _, left, operator, right = node
         
-        left_val = left[1] 
-        right_val = right[1] 
+        if utils.is_negnumber(left) :
+            left_val = left[2]
+        else :
+            left_val = left[1] 
         
+        if utils.is_negnumber(right) :
+            right_val = right[2]
+        else:
+            right_val = right[1] 
+        
+        if right[0] == "boolExpr":
+            right_val = self.visit(right)
         
         if isinstance(left_val, str):
             left_val = self.sym_table.lookup(left_val)["Value"]
