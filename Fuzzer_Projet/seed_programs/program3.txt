@@ -1,0 +1,10 @@
+function main(){
+    x = -5;
+    y = 4;
+    z = new array(y);
+    z[1] = x;
+
+    u = z[1];
+
+    return u;
+}

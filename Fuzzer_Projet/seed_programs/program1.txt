@@ -1,0 +1,14 @@
+function main(){
+    x = 5;
+    y = 2;
+    if (x > 2){
+        y = call incr(y);
+    }
+    else{
+        x = call incr(x);
+    }
+}
+function incr(b){
+    b = b + 1;
+    return b;
+}
