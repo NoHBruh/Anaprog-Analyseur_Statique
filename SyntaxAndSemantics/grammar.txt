@@ -6,23 +6,23 @@ paramlist ::= param | param "," paramlist | ɛ
 param ::= identifier | num
 
 stmtlist ::= stmt*
-stmt ::= assign_val | assign_func_call | if | while | sequence | returnStmt | array_create | array_assign 
+stmt ::= assign_val | assign_func_call | if | while | sequence | returnStmt | array_create | array_assign
 
 assign_val ::= identifier "=" expr ";"
-assign_func_call ::= identifier "=" "call" identifier "(" [paramlist] ")" ";"
+assign_func_call ::= identifier "=" "call" identifier "(" paramlist ")" ";"
 array_create ::= identifier "=" "new" "array" "(" arithExpr ")" ";" 
 array_assign ::= identifier "[" arithExpr "]"  "=" expr ";"
 
 if ::= "if" "(" expr ")" stmt "else" stmt
-while ::= "while" "(" expr ")" stmt
+while ::= "while" "(" boolExpr ")" sequence
 sequence ::= "{" stmtlist "}"
 returnStmt ::= "return" expr ";"
 
-expr ::= arithExpr | boolExpr |  identifier "[" arithExpr "]" | identifier "[" "]"
+expr ::= boolExpr | arithExpr |  identifier "[" arithExpr "]" 
 arithExpr ::= arithExpr op arithExpr| noprnd
-boolExpr ::= boolExpr rop boolExpr| boprnd
-noprnd ::= var | num | negnum
-boprnd ::= var | "true" | "false" 
+boolExpr ::= boolExpr rop boolExpr | boprnd
+noprnd ::= var | num | negnum 
+boprnd ::= var | 'True' | 'False'
 op ::= "+" | "-" | "*" | "/"
 rop ::= "<" | ">" | "==" | "!=" | ">=" | "<=" | "and" | "or"
 
