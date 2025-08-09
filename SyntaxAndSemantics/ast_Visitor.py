@@ -1,5 +1,8 @@
 import utils
 
+import time
+
+
 class AstVisitor :
     def __init__(self, sym_table):
         self.sym_table = sym_table
@@ -35,7 +38,7 @@ class AstVisitor :
         main = (program_body[0], program_body[1]) #name and stmtlist
         prog_functions = program_body[2] # functionlist
         
-        '''program functions must be analyzed first, as they might be used in main program'''
+        '''program functions must be visited first, as they might be used in main program'''
         print("Visiting program")
         # ----------------Functions analysis----------------
 
@@ -244,7 +247,7 @@ class AstVisitor :
     def visit_array_expr(self, node) :
         
         _, array_id, index = node
-        print(f"Analyzing array access: {array_id}[{index}]")
+        print(f"Visiting array access: {array_id}[{index}]")
 
         
         if not self.sym_table.exist(array_id):
@@ -301,9 +304,14 @@ class AstVisitor :
         self.sym_table.new_scope()
         if bool_stmt[0] == 'bool' and bool_stmt[1] == True :
             raise Exception('Infinite While loop, operation unallowed')
+        timeout = time.time() + 5 # 5 secondes 
         while self.visit(bool_stmt):
+            time.sleep(1)
             for stmt in loop :
                 self.visit(stmt)
+            if time.time() > timeout :
+                self.sym_table.leave_scope()
+                break
         self.sym_table.leave_scope()
     
     def visit_sequence(self, node) :
@@ -371,18 +379,20 @@ class AstVisitor :
         return utils.process_arith_binOp(left_val, operator, right_val)
         
     def visit_boolExpr(self, node) :
-        
+        print("visiting Bool expression")
         _, left, operator, right = node
         
         if utils.is_negnumber(left) :
-            left_val = left[2]
+            left_val = -left[2]
         else :
             left_val = left[1] 
         
+        
         if utils.is_negnumber(right) :
-            right_val = right[2]
+            right_val = -right[2]
         else:
             right_val = right[1] 
+        
         
         if right[0] == "boolExpr":
             right_val = self.visit(right)

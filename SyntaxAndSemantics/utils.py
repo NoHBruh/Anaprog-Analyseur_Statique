@@ -1,7 +1,7 @@
 import operator
 
 bops = {'==' : operator.eq, '!=' : operator.ne, '>=' : operator.ge, '<=' : operator.le, '>' : operator.gt, '<' : operator.lt,
-       'and' : operator.and_, 'or' : operator.or_}
+       '&' : operator.and_, '|' : operator.or_}
 
 arith_ops = {"+": operator.add, "-": operator.sub, '*' : operator.mul, '/' : operator.truediv }
 
@@ -29,13 +29,13 @@ def process_bool_binOp(left, operator, right) :
     
 
     
-    if (left in {True, False} or right in {True, False}) and operator in {"<", ">", ">=", "<="} :
+    if (isinstance(left, bool) or isinstance(right, bool)) and operator in {"<", ">", ">=", "<="} :
         return False 
         
     try:
-        result = bops[operator](left, right)
+        result = bops[operator](int(left), int(right))
         print(f'Bool operation {operator} between {left} and {right} processed : {result}')
-        return result
+        return bool(result)
     except ValueError:
         print(f'{operator} : unsupported boolean operator')
         return

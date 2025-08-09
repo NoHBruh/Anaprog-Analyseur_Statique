@@ -165,6 +165,12 @@ def p_boprnd_var(p) :
     """boprnd : var"""
     p[0] = p[1]
 
+def p_boprnd_num(p) :
+    '''boprnd : NUMBER
+                | MINUS NUMBER'''
+    if len(p) == 2 :
+        p[0] = ('number', p[1])
+    else : p[0] = ('negnumber', p[1], p[2])
      
 def p_var(p) :
     '''var : IDENTIFIER'''
@@ -192,10 +198,14 @@ def p_boolExpr_binOp(p):
                 | arithExpr GTE arithExpr
                 | arithExpr DEQUAL arithExpr
                 | arithExpr NEQUAL arithExpr
+                | boprnd LT boprnd
+                | boprnd GT boprnd
+                | boprnd LTE boprnd
+                | boprnd GTE boprnd
                 | boprnd DEQUAL boprnd
                 | boprnd NEQUAL boprnd
-                | boolExpr AND boolExpr
-                | boolExpr OR boolExpr
+                | boprnd AND boprnd
+                | boprnd OR boprnd
                 | boprnd'''
     if len(p) == 2:
         p[0] = p[1]

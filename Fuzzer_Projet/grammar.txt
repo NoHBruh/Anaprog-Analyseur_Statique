@@ -12,19 +12,20 @@ assign_val ::= identifier "=" expr ";"
 assign_func_call ::= identifier "=" "call" identifier "(" paramlist ")" ";"
 array_create ::= identifier "=" "new" "array" "(" arithExpr ")" ";" 
 array_assign ::= identifier "[" arithExpr "]"  "=" expr ";"
-
-if ::= "if" "(" expr ")" stmt "else" stmt
+array_expr ::= identifier "[" arithExpr "]"
+if ::= "if" "(" bool_arith ")" stmt "else" stmt
 while ::= "while" "(" boolExpr ")" sequence
 sequence ::= "{" stmtlist "}"
 returnStmt ::= "return" expr ";"
 
-expr ::= boolExpr | arithExpr |  identifier "[" arithExpr "]" 
+expr ::= bool_arith |  array_expr
+bool_arith ::= boolExpr | arithExpr
 arithExpr ::= arithExpr op arithExpr| noprnd
-boolExpr ::= boolExpr rop boolExpr | boprnd
+boolExpr ::= boprnd rop boprnd | boprnd
 noprnd ::= var | num | negnum 
-boprnd ::= var | 'True' | 'False'
+boprnd ::= var | num | negnum 'True' | 'False'
 op ::= "+" | "-" | "*" | "/"
-rop ::= "<" | ">" | "==" | "!=" | ">=" | "<=" | "and" | "or"
+rop ::= "<" | ">" | "==" | "!=" | ">=" | "<=" | "&" | "|"
 
 var ::= identifier
 funcCall ::= identifier
