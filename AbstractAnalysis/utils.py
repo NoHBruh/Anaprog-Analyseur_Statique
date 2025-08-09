@@ -251,7 +251,7 @@ def handle_concrete_val_least_upper_bound(var1, var2):
     elif var1 == var2 == 0  or var1 == -var2:
         return AbstractDomain.ZERO
     
-    elif var1 >= 0 and var2 < 0 or var1 < 0 and var2 >=0 :
+    elif (var1 >= 0 and var2 < 0 ) or (var1 < 0 and var2 >=0) or (var1 >=0 and var2 >= 0) :
         return AbstractDomain.UNSURE
     
     return AbstractDomain.TOP
@@ -269,6 +269,9 @@ def handle_abstract_val_least_upper_bound(var1, var2):
         return AbstractDomain.TOP
     
     elif var1 == AbstractDomain.UNSURE and var2 in abs_integers or var1 in abs_integers and var2 == AbstractDomain.UNSURE :
+        return AbstractDomain.UNSURE
+    
+    elif (var1 == var2 and var1 in abs_integers and var2 in abs_integers) :
         return AbstractDomain.UNSURE
     
     elif var1 == var2 :
