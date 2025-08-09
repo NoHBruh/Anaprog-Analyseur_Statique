@@ -11,6 +11,7 @@ class Worklist:
         self.warnings = Warnings()
         self.work_list = []
         self.abs_env_collection = {}
+        self.step = 0
         
     def visit(self, node):
         """intermediate visitor for call the right one on the current node
@@ -28,6 +29,8 @@ class Worklist:
         node_type = node[0]
         visitor_name = f"visit_{node_type}"
         visitor = getattr(self, visitor_name, self.default_visitor)
+        print(f'ABSTRACT ENVIRONEMENT OF STEP n°{self.step} : {self.abstract_environement.abs_env}\n')
+        self.step +=1
         return visitor(node)    
     
     def default_visitor(self,node) :
@@ -84,7 +87,7 @@ class Worklist:
         return self.abstract_environement.abs_env
     
     def visit_return(self, _) :
-        print(f'\n end of program, abstract environment is : {self.abstract_environement.abs_env}')
+        return
     
     def visit_number(self, node) :
         _, val = node
@@ -312,16 +315,23 @@ class Worklist:
                             self.abstract_environement.while_widening_handler(loop)
                         
                         else:
+
                             val1 = self.abstract_environement.abs_env[var1]
                             val2 = self.abstract_environement.abs_env[var2]
                             
-                            if val1 not in AbstractDomain and val2 not in AbstractDomain :
+                            if val1 == AbstractDomain.ZERO :
+                                val1 = 0;
+                            if val2 == AbstractDomain.ZERO :
+                                val2 = 0
+      
+                            if isinstance(val1, int) and isinstance(val2, int) :
+
                                 match op :
                                     case '>' | '>=' :
-                                        iterations = val1 - val2 
+                                        iterations = int(val1 - val2) 
                                     
                                     case '<' | '<=' :
-                                        iterations = val2 - val1
+                                        iterations = int(val2 - val1)
                                         
                                     case '!=' :
                                         iterations = abs(val2 - val1)
@@ -374,10 +384,27 @@ class Worklist:
             case (('number', val1), ('number', val2)) :
                 self.abstract_environement.constant_assign_flow_function(var_symbol, arith_op(val1, val2))
 
+            case (('number', val1), ('negnumber',_ , val2)) :
+                self.abstract_environement.constant_assign_flow_function(var_symbol, arith_op(val1, -val2))
+
+            case (('negnumber',_, val1), ('number', val2)) :
+                self.abstract_environement.constant_assign_flow_function(var_symbol, arith_op(-val1, val2))
+
             case (('var', val1), ('number', val2)):
                 flow_function_name = f'var_const_{op}_assign_flow_function'
                 flow_function = getattr(self.abstract_environement, flow_function_name)
                 return flow_function(var_symbol, val1, val2)
+            
+            case (('var', val1), ('negnumber',_, val2)):
+                flow_function_name = f'var_const_{op}_assign_flow_function'
+                flow_function = getattr(self.abstract_environement, flow_function_name)
+                return flow_function(var_symbol, val1, -val2)
+            
+            case (('negnumber', _, val1), ('var', val2)):
+                flow_function_name = f'var_const_{op}_assign_flow_function'
+                flow_function = getattr(self.abstract_environement, flow_function_name)
+                return flow_function(var_symbol, -val1, val2)
+                   
                 
             case (('number', val1),('var', val2)) :
                 flow_function_name = f'const_var_{op}_assign_flow_function'
