@@ -22,7 +22,7 @@ def main():
     print(" ↓↓↓ ERRORS/WARNINGS BELOW ↓↓↓ ")
     print("\n")
     
-    
+    print(f'\n end of program, abstract environment is : {wl.abstract_environement.abs_env}')
     wl.warnings.print_warnings()
     
     
