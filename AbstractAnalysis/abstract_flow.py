@@ -18,13 +18,13 @@ class AbstractEnvironment :
     
     def constant_assign_flow_function(self, symbol, value):
         """var x = constant c"""
-        if value in {True, False} :
+        if isinstance(value, bool) :
             self.abs_env[symbol] = AbstractDomain.NOTNUMERIC
         elif (value < 0):
-            self.abs_env[symbol] = -value
+            self.abs_env[symbol] = value
             
         elif value == 0 : 
-            self.abs_env[symbol] = AbstractDomain.ZERO 
+            self.abs_env[symbol] = AbstractDomain.ZERO
             
         elif value > 0 :
             self.abs_env[symbol] = value
@@ -235,10 +235,13 @@ class AbstractEnvironment :
                 val1 = abs_env1[var]
                 val2 = abs_env2[var]
                 
-                if val1 not in AbstractDomain and val2 not in AbstractDomain and val1 != val2 :
+                if val1 == val2 : continue #skip this variable as it has not changed
+                
+                if isinstance(val1, int) and isinstance(val2, int) :
                     result = handle_concrete_val_least_upper_bound(val1, val2)
 
-                elif val1 in AbstractDomain and val2 in AbstractDomain :
+                elif val1 in AbstractDomain and val2 in AbstractDomain:
+                    print(val1, val2)
                     result = handle_abstract_val_least_upper_bound(val1, val2)
                     
                 #only one value is abstract    
